@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "brand": "Travis Scott x Air Jordan",
+    "name": "Jordan Jumpman Jack",
+    "colorway": "TR 'Green Spark'",
+    "price": 189.99,
+    "tag": "New Arrival",
+    "description": "A Travis Scott collaboration reimagining the Jumpman Jack silhouette with earthy tones and signature reversed Swoosh detailing.",
+    "accentColor": "#5faa6e"
+  },
+  {
+    "id": 2,
+    "brand": "Adidas",
+    "name": "BADBO 1.0",
+    "colorway": "'Rise'",
+    "price": 174.99,
+    "tag": "Best Seller",
+    "description": "The iconic full-length Air unit returns in its most recognizable colorway — reflective silver with bold red accents.",
+    "accentColor": "#e0743a"
+  },
+  {
+    "id": 3,
+    "brand": "Nike Kobe Dunk Low",
+    "name": "Proto 'Lower Merion",
+    "colorway": "'Aces Home'",
+    "price": 229.99,
+    "tag": "Limited Edition",
+    "description": "High-frequency Primeknit construction with full-length Boost cushioning in the unmistakable black and white Zebra print.",
+    "accentColor": "#b85c8a"
+  },
+  {
+    "id": 4,
+    "brand": "Kobe Bryant x Nike Air",
+    "name": "Force 1 low 'Lower",
+    "colorway": "'Merion'",
+    "price": 199.99,
+    "tag": "Heritage",
+    "description": "Made in USA craftsmanship with premium pigskin leather and mesh upper, featuring ENCAP midsole technology for all-day support.",
+    "accentColor": "#7b6ec9"
+  },
+  {
+    "id": 5,
+    "brand": "Nike Air",
+    "name": "Foamposite Pro",
+    "colorway": "'University Blue'",
+    "price": 299.99,
+    "tag": "Sale",
+    "description": "Virgil Abloh's deconstructed take on the AF1 classic, featuring exposed foam, zip ties, and signature quotation mark branding.",
+    "accentColor": "#4e8fd4"
+  }
+]
