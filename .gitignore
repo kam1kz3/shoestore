@@ -5,6 +5,7 @@ dist-ssr
 *.log
 .DS_Store
 .claude
+.vercel
 
 # Not needed to run the site — kept locally for reference / regeneration only
 /package.json
