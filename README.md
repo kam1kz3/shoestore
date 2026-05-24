@@ -90,7 +90,6 @@ The whole tree is wrapped in `<ErrorBoundary>`, with `<Splash>` rendered exclusi
 - **Tokens** live in [`index.css`](frontend/src/index.css) — foreground / background / border scales, accent (dynamic per item), shadow, product palette, status colors (with `--status-danger-*` for destructive actions), admin sidebar palette, plus type / weight / leading / tracking scales.
 - **Dark mode** overrides foreground, background, accent, shadow, status text, and product palette inside a `@media (prefers-color-scheme: dark)` block.
 - **Legacy aliases** (`--text`, `--text-h`, `--text-s`) point at `--fg2 / --fg1 / --fg3` so existing CSS keeps working while new code can adopt the richer scale.
-- The handoff at [`design_handoff_solestore/colors_and_type.css`](design_handoff_solestore/colors_and_type.css) is the canonical spec — most of it is now reflected in `index.css`.
 
 ### Activity log instrumentation pattern
 

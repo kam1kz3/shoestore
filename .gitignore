@@ -5,3 +5,9 @@ dist-ssr
 *.log
 .DS_Store
 .claude
+
+# Not needed to run the site — kept locally for reference / regeneration only
+/package.json
+/package-lock.json
+/design_handoff_solestore/
+/scripts/
