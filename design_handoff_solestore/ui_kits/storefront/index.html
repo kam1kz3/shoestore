@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoleStore — Storefront UI Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --text:   #6b6375;
+  --text-h: #08060d;
+  --bg:     #ffffff;
+  --border: #e5e4e7;
+  --bg2:    #f4f3ec;
+  --accent: #000000;
+  --accent-bg:     rgba(8,6,13,0.06);
+  --accent-border: rgba(8,6,13,0.20);
+  --shadow: rgba(0,0,0,0.1) 0 10px 15px -3px, rgba(0,0,0,0.05) 0 4px 6px -2px;
+  font-family: 'Roboto', sans-serif;
+}
+body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── Nav ── */
+.nav { display:flex; align-items:center; height:56px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:100; flex-shrink:0; }
+.nav-left { flex:1; padding-left:24px; }
+.nav-logo { font-size:15px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-h); cursor:pointer; background:none; border:none; }
+.nav-center { display:flex; gap:0; }
+.nav-link { font-size:13px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; background:transparent; border:none; padding:6px 16px; cursor:pointer; color:var(--text); position:relative; transition:color 0.15s; height:56px; }
+.nav-link::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:2px; background:var(--accent); transform:scaleX(0); transform-origin:center; transition:transform 0.25s ease; }
+.nav-link.active { color:var(--text-h); }
+.nav-link.active::after { transform:scaleX(1); }
+.nav-right { flex:1; display:flex; align-items:center; justify-content:flex-end; gap:4px; padding-right:20px; }
+.nav-icon-btn { display:flex; align-items:center; justify-content:center; background:transparent; border:none; padding:8px; cursor:pointer; color:var(--text-h); border-radius:4px; position:relative; transition:opacity 0.15s; }
+.nav-icon-btn:hover { opacity:0.6; }
+.cart-badge { position:absolute; top:2px; right:2px; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:var(--accent-bg); color:var(--accent); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--bg); border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow); z-index:200; overflow:hidden; animation:dfade 0.15s ease; }
+@keyframes dfade { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.cart-drop { width:280px; }
+.cart-items { max-height:240px; overflow-y:auto; padding:8px 0; }
+.cart-item { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; padding:10px 14px; transition:background 0.12s; }
+.cart-item:hover { background:var(--accent-bg); }
+.cart-name { font-size:13px; font-weight:500; color:var(--text-h); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+.cart-sub  { font-size:11px; color:var(--text); margin:0; }
+.cart-price { font-size:13px; font-weight:600; color:var(--text-h); margin:0; white-space:nowrap; }
+.cart-remove { background:none; border:none; cursor:pointer; color:var(--text); transition:color 0.15s; padding:0; display:flex; align-items:center; }
+.cart-remove:hover { color:#e53e3e; }
+.cart-footer { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-top:1px solid var(--border); }
+.cart-total-label { font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; color:var(--text); }
+.cart-total { font-size:15px; font-weight:700; color:var(--text-h); }
+.cart-empty { padding:24px 16px; text-align:center; }
+.cart-empty p:first-child { font-size:14px; font-weight:500; color:var(--text-h); margin-bottom:4px; }
+.cart-empty p:last-child  { font-size:12px; color:var(--text); }
+.menu-drop { width:180px; padding:6px; display:flex; flex-direction:column; }
+.menu-item { font-size:14px; font-weight:400; background:transparent; border:none; border-radius:6px; padding:9px 12px; text-align:left; cursor:pointer; color:var(--text-h); transition:background 0.15s; }
+.menu-item:hover { background:var(--accent-bg); }
+.menu-divider { height:1px; background:var(--border); margin:4px 0; }
+.menu-item--red { color:#e53e3e; }
+.menu-item--red:hover { background:rgba(229,62,62,0.1); }
+
+/* ── Home ── */
+.home { flex:1; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; min-height:calc(100vh - 56px); }
+.home-info { position:absolute; left:48px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:10px; max-width:320px; text-align:left; }
+.home-info-tag { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); background:var(--accent-bg); border:1px solid var(--accent-border); border-radius:4px; padding:3px 8px; align-self:flex-start; }
+.home-info-brand { font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--text); margin:0; }
+.home-info-name { font-size:32px; font-weight:700; letter-spacing:-0.5px; color:var(--text-h); margin:0; line-height:1.1; }
+.home-info-colorway { font-size:14px; color:var(--text); margin:0; }
+.home-info-price { font-size:22px; font-weight:500; color:var(--text-h); margin:0; }
+.home-info-desc { font-size:13px; line-height:1.6; color:var(--text); margin:0; }
+.home-img { max-height:65vh; max-width:60vw; object-fit:contain; transform:scaleX(-1) rotate(25deg); user-select:none; pointer-events:none; }
+.home-sizes { position:absolute; bottom:32px; left:48px; display:flex; flex-direction:column; gap:8px; }
+.sizes-label { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text); margin:0; }
+.sizes-scroll { display:flex; gap:6px; }
+.size-chip { display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 12px; background:transparent; border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:background 0.15s,border-color 0.15s; }
+.size-chip:hover { background:var(--accent-bg); border-color:var(--accent-border); }
+.size-chip.active { background:var(--text-h); border-color:var(--text-h); }
+.size-chip.active .eu, .size-chip.active .us { color:var(--bg); }
+.eu { font-size:13px; font-weight:600; color:var(--text-h); }
+.us { font-size:10px; color:var(--text); }
+.home-btns { position:absolute; bottom:32px; left:50%; transform:translateX(-50%); display:flex; gap:10px; }
+.home-btn { font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:10px 28px; border-radius:0; cursor:pointer; white-space:nowrap; transition:opacity 0.15s; }
+.home-btn--solid { background:var(--accent); border:1px solid var(--accent); color:#fff; }
+.home-btn--solid:hover { opacity:0.85; }
+.home-btn--outline { background:transparent; border:1px solid var(--border); color:var(--text-h); }
+.home-btn--outline:hover { border-color:var(--text-h); }
+.home-nav { position:absolute; bottom:32px; right:32px; display:flex; align-items:center; gap:10px; }
+.nav-circle { display:flex; align-items:center; justify-content:center; width:34px; height:34px; background:transparent; border:1px solid var(--border); border-radius:50%; cursor:pointer; color:var(--text-h); transition:background 0.15s,border-color 0.15s; }
+.nav-circle:hover { background:var(--accent-bg); border-color:var(--accent-border); }
+.dot { width:7px; height:7px; border-radius:50%; border:none; background:var(--border); cursor:pointer; padding:0; transition:background 0.2s,transform 0.2s; }
+.dot.active { background:var(--text-h); transform:scale(1.3); }
+
+/* ── Store ── */
+.store { flex:1; padding:40px 48px 64px; }
+.store-header { display:flex; align-items:baseline; gap:12px; margin-bottom:32px; }
+.store-title { font-size:28px; font-weight:700; letter-spacing:-0.5px; color:var(--text-h); margin:0; }
+.store-count { font-size:13px; color:var(--text); }
+.grid { display:grid; grid-template-columns:repeat(3,1fr); grid-auto-rows:220px; grid-auto-flow:dense; gap:16px; }
+.tile { text-decoration:none; display:flex; flex-direction:column; background:var(--bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s; }
+.tile:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
+.tile--big    { grid-column:span 2; grid-row:span 3; }
+.tile--medium { grid-column:span 1; grid-row:span 2; }
+.tile--small  { grid-column:span 1; grid-row:span 1; }
+.tile-img-wrap { position:relative; flex:1; background:var(--bg2); overflow:hidden; min-height:0; }
+.tile-img { width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.05); transition:transform 0.35s ease; }
+.tile:hover .tile-img { transform:scale(1.08) rotate(3deg); }
+.tile-tag { position:absolute; bottom:10px; left:10px; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; background:var(--accent-bg); color:var(--accent); padding:3px 8px; border-radius:3px; pointer-events:none; }
+.tile-heart { position:absolute; top:10px; right:10px; width:32px; height:32px; border-radius:50%; border:none; background:var(--bg); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,0.15); transition:color 0.18s,transform 0.18s; color:var(--text); }
+.tile-heart:hover { transform:scale(1.12); color:var(--accent); }
+.tile-heart.wishlisted { color:var(--accent); }
+.tile-info { padding:14px 16px 16px; display:flex; flex-direction:column; gap:4px; }
+.tile-brand { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin:0; }
+.tile-name  { font-size:15px; font-weight:600; color:var(--text-h); margin:0; line-height:1.3; }
+.tile--small .tile-name { font-size:13px; }
+.tile-colorway { font-size:12px; color:var(--text); margin:0; }
+.tile-bottom { display:flex; align-items:center; justify-content:space-between; margin-top:6px; }
+.tile-price { font-size:16px; font-weight:700; color:var(--text-h); margin:0; }
+.tile--small .tile-price { font-size:14px; }
+.tile-cart-btn { font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; background:var(--accent-bg); border:1px solid var(--accent-border); color:var(--accent); padding:7px 14px; cursor:pointer; transition:opacity 0.15s; }
+.tile-cart-btn:hover { opacity:0.85; }
+.tile-cart-icon { width:30px; height:30px; border-radius:50%; border:1px solid var(--border); background:var(--bg); color:var(--text-h); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.15s,color 0.15s,border-color 0.15s; flex-shrink:0; }
+.tile-cart-icon:hover { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+/* ── Size panel modal ── */
+.backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:300; display:flex; align-items:center; justify-content:center; animation:bdin 0.18s ease; }
+@keyframes bdin { from{opacity:0} to{opacity:1} }
+.panel { background:var(--bg); border:1px solid var(--border); border-radius:12px; width:100%; max-width:400px; margin:16px; padding:24px; display:flex; flex-direction:column; gap:20px; animation:pin 0.2s ease; }
+@keyframes pin { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.panel-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.panel-name { font-size:16px; font-weight:700; color:var(--text-h); margin:0; }
+.panel-colorway { font-size:12px; color:var(--text); margin:4px 0 0; }
+.panel-close { background:none; border:none; color:var(--text); cursor:pointer; display:flex; transition:color 0.15s; }
+.panel-close:hover { color:var(--text-h); }
+.panel-label { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text); margin:0; }
+.panel-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.panel-item { display:flex; flex-direction:column; align-items:center; gap:2px; padding:10px 4px; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:border-color 0.15s,background 0.15s; }
+.panel-item:hover { border-color:var(--accent-border); background:var(--accent-bg); }
+.panel-item.active { border-color:var(--accent); background:var(--accent-bg); }
+.panel-item.active .p-eu { color:var(--accent); }
+.p-eu { font-size:13px; font-weight:600; color:var(--text-h); }
+.p-us { font-size:10px; color:var(--text); }
+.panel-confirm { font-size:13px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; background:var(--accent-bg); border:1px solid var(--accent-border); color:var(--accent); padding:13px; cursor:pointer; border-radius:6px; transition:opacity 0.15s; width:100%; }
+.panel-confirm:hover { opacity:0.88; }
+
+/* ── Item detail ── */
+.item-page { flex:1; padding:24px 48px 48px; }
+.back-btn { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:var(--text); background:none; border:none; cursor:pointer; padding:0; margin-bottom:28px; transition:color 0.15s; }
+.back-btn:hover { color:var(--text-h); }
+.item-layout { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start; }
+.gallery { display:flex; flex-direction:column; gap:12px; }
+.gallery-main { aspect-ratio:4/3; background:var(--bg2); border-radius:4px; overflow:hidden; }
+.gallery-img { width:100%; height:100%; object-fit:contain; transform:scale(1.05); transition:transform 0.4s ease; }
+.gallery-main:hover .gallery-img { transform:scale(1.08) rotate(3deg); }
+.gallery-thumbs { display:flex; gap:8px; }
+.gallery-thumb { flex:1; aspect-ratio:1; background:var(--bg2); border:2px solid transparent; border-radius:4px; overflow:hidden; cursor:pointer; padding:0; transition:border-color 0.15s; }
+.gallery-thumb.active { border-color:var(--accent); }
+.gallery-thumb img { width:100%; height:100%; object-fit:contain; }
+.item-details { display:flex; flex-direction:column; gap:12px; }
+.item-tag { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); background:var(--accent-bg); border:1px solid var(--accent-border); border-radius:4px; padding:3px 8px; align-self:flex-start; }
+.item-brand { font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--text); margin:0; }
+.item-name { font-size:32px; font-weight:700; letter-spacing:-0.5px; color:var(--text-h); margin:0; line-height:1.1; }
+.item-colorway { font-size:14px; color:var(--text); margin:0; }
+.item-price { font-size:24px; font-weight:600; color:var(--text-h); margin:0; }
+.item-desc { font-size:14px; line-height:1.7; color:var(--text); margin:0; padding-bottom:8px; border-bottom:1px solid var(--border); }
+.item-sizes { display:flex; flex-direction:column; gap:10px; }
+.item-sizes-label { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text); margin:0; }
+.item-size-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.item-size-btn { display:flex; flex-direction:column; align-items:center; gap:2px; padding:10px 8px; background:transparent; border:1px solid var(--border); border-radius:4px; cursor:pointer; transition:border-color 0.15s,background 0.15s; }
+.item-size-btn:hover { border-color:var(--accent-border); background:var(--accent-bg); }
+.item-size-btn.active { border-color:var(--accent); background:var(--accent-bg); }
+.item-size-btn.active .i-eu { color:var(--accent); }
+.i-eu { font-size:13px; font-weight:600; color:var(--text-h); }
+.i-us { font-size:10px; color:var(--text); }
+.item-actions { display:flex; gap:10px; align-items:center; padding-top:4px; }
+.add-to-cart { flex:1; font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:14px 24px; background:var(--accent-bg); border:1px solid var(--accent-border); color:var(--accent); cursor:pointer; border-radius:0; transition:opacity 0.15s; }
+.add-to-cart:hover { opacity:0.85; }
+.wishlist-btn { display:flex; align-items:center; justify-content:center; width:48px; height:48px; background:transparent; border:1px solid var(--border); border-radius:4px; cursor:pointer; color:var(--text); transition:border-color 0.15s,color 0.15s; flex-shrink:0; }
+.wishlist-btn:hover, .wishlist-btn.active { border-color:var(--accent-border); color:var(--accent); }
+</style>
+</head>
+<body>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+const SIZES = [
+  {eu:'38',us:'6'},{eu:'39',us:'6.5'},{eu:'40',us:'7'},{eu:'41',us:'7.5'},
+  {eu:'42',us:'8'},{eu:'43',us:'9'},{eu:'44',us:'9.5'},{eu:'45',us:'10'}
+];
+
+const PRODUCTS = [
+  { id:1, brand:'Travis Scott x Air Jordan', name:'Jordan Jumpman Jack TR', colorway:"'Green Spark'", price:189.99, tag:'New Arrival', img:'../../assets/home_display_item_1.png', accent:'#5faa6e', size:'big', desc:'A Travis Scott collaboration reimagining the Jumpman Jack silhouette with earthy tones and signature reversed Swoosh detailing.' },
+  { id:2, brand:'Adidas', name:'BADBO 1.0', colorway:"'Rise'", price:174.99, tag:'Best Seller', img:'../../assets/home_display_item_2.png', accent:'#e0743a', size:'medium', desc:"The iconic silhouette returns in its most recognizable colorway — reflective silver with bold orange accents." },
+  { id:3, brand:'Nike Kobe Dunk Low', name:"Proto 'Lower Merion'", colorway:"'Aces Home'", price:229.99, tag:'Limited Edition', img:'../../assets/home_display_item_3.png', accent:'#b85c8a', size:'medium', desc:'High-frequency Primeknit construction with full-length Boost cushioning in the unmistakable Zebra print.' },
+  { id:4, brand:'Kobe Bryant x Nike Air', name:"Force 1 Low 'Lower Merion'", colorway:"'Merion'", price:199.99, tag:'Heritage', img:'../../assets/home_display_item_4.png', accent:'#7b6ec9', size:'small', desc:'Made in USA craftsmanship with premium pigskin leather and mesh upper, featuring ENCAP midsole technology.' },
+  { id:5, brand:'Nike Air', name:'Foamposite Pro', colorway:"'University Blue'", price:299.99, tag:'Sale', img:'../../assets/home_display_item_5.png', accent:'#4e8fd4', size:'small', desc:"Virgil Abloh's deconstructed take on the AF1 classic, featuring exposed foam, zip ties, and quotation mark branding." },
+];
+
+function IconCart() { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>; }
+function IconMenu() { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>; }
+function IconHeart({filled}) { return filled
+  ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+  : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
+}
+function IconX() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
+function IconChevL() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>; }
+function IconChevR() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>; }
+
+function Nav({ page, setPage, cart, removeFromCart }) {
+  const [cartOpen, setCartOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const cartRef = useRef(); const menuRef = useRef();
+  useEffect(() => {
+    function h(e) {
+      if (cartRef.current && !cartRef.current.contains(e.target)) setCartOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    }
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+  const total = cart.reduce((s,i) => s + i.price, 0);
+  return (
+    <nav className="nav">
+      <div className="nav-left">
+        <button className="nav-logo" onClick={() => setPage('home')}>SoleStore</button>
+      </div>
+      <div className="nav-center">
+        {['home','store'].map(p => (
+          <button key={p} className={`nav-link${page===p?' active':''}`} onClick={() => setPage(p)}>
+            {p.charAt(0).toUpperCase()+p.slice(1)}
+          </button>
+        ))}
+      </div>
+      <div className="nav-right">
+        <div style={{position:'relative'}} ref={cartRef}>
+          <button className="nav-icon-btn" onClick={() => { setCartOpen(o => !o); setMenuOpen(false); }}>
+            <IconCart />
+            {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
+          </button>
+          {cartOpen && (
+            <div className="dropdown cart-drop">
+              {cart.length === 0 ? (
+                <div className="cart-empty"><p>Your cart is empty.</p><p>Items you add will appear here.</p></div>
+              ) : (
+                <>
+                  <div className="cart-items">
+                    {cart.map(item => (
+                      <div key={item.cartId} className="cart-item">
+                        <div>
+                          <p className="cart-name">{item.name}</p>
+                          <p className="cart-sub">{item.colorway} · EU {item.eu}</p>
+                        </div>
+                        <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:4,flexShrink:0}}>
+                          <p className="cart-price">${item.price.toFixed(2)}</p>
+                          <button className="cart-remove" onClick={() => removeFromCart(item.cartId)}><IconX /></button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="cart-footer">
+                    <span className="cart-total-label">Total</span>
+                    <span className="cart-total">${total.toFixed(2)}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+        <div style={{position:'relative'}} ref={menuRef}>
+          <button className="nav-icon-btn" onClick={() => { setMenuOpen(o => !o); setCartOpen(false); }}>
+            <IconMenu />
+          </button>
+          {menuOpen && (
+            <div className="dropdown menu-drop">
+              <button className="menu-item" onClick={() => { setPage('home'); setMenuOpen(false); }}>Home</button>
+              <button className="menu-item" onClick={() => { setPage('store'); setMenuOpen(false); }}>Store</button>
+              <div className="menu-divider"/>
+              <button className="menu-item menu-item--red">Sign Out</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function HomeHero({ setPage, cart, setCart }) {
+  const [idx, setIdx] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const product = PRODUCTS[idx];
+
+  const accentStyle = {
+    '--accent': product.accent,
+    '--accent-bg': `${product.accent}15`,
+    '--accent-border': `${product.accent}40`,
+  };
+
+  function addToCart() {
+    if (!selectedSize) return;
+    setCart(c => [...c, { ...product, eu: selectedSize.eu, us: selectedSize.us, cartId: Date.now() }]);
+  }
+
+  return (
+    <div className="home" style={accentStyle}>
+      <div className="home-info">
+        <span className="home-info-tag">{product.tag}</span>
+        <p className="home-info-brand">{product.brand}</p>
+        <p className="home-info-name">{product.name}</p>
+        <p className="home-info-colorway">{product.colorway}</p>
+        <p className="home-info-price">${product.price.toFixed(2)}</p>
+        <p className="home-info-desc">{product.desc}</p>
+      </div>
+      <img key={idx} className="home-img" src={product.img} alt={product.name} />
+      <div className="home-sizes">
+        <p className="sizes-label">Size</p>
+        <div className="sizes-scroll">
+          {SIZES.slice(0,5).map(s => (
+            <button key={s.eu} className={`size-chip${selectedSize?.eu===s.eu?' active':''}`} onClick={() => setSelectedSize(s)}>
+              <span className="eu">EU {s.eu}</span>
+              <span className="us">US {s.us}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="home-btns">
+        <button className="home-btn home-btn--outline" onClick={() => setPage('store')}>Browse Store</button>
+        <button className="home-btn home-btn--solid" style={{background:product.accent,borderColor:product.accent}} onClick={addToCart}>
+          {selectedSize ? 'Add to Cart' : 'Select Size'}
+        </button>
+      </div>
+      <div className="home-nav">
+        <button className="nav-circle" onClick={() => { setIdx(i => (i-1+PRODUCTS.length)%PRODUCTS.length); setSelectedSize(null); }}><IconChevL /></button>
+        <div style={{display:'flex',gap:6}}>
+          {PRODUCTS.map((_,i) => (
+            <button key={i} className={`dot${i===idx?' active':''}`} onClick={() => { setIdx(i); setSelectedSize(null); }} />
+          ))}
+        </div>
+        <button className="nav-circle" onClick={() => { setIdx(i => (i+1)%PRODUCTS.length); setSelectedSize(null); }}><IconChevR /></button>
+      </div>
+    </div>
+  );
+}
+
+function SizePanel({ product, onClose, onAdd }) {
+  const [sel, setSel] = useState(null);
+  return (
+    <div className="backdrop" onClick={e => e.target===e.currentTarget && onClose()}>
+      <div className="panel">
+        <div className="panel-header">
+          <div>
+            <p className="panel-name">{product.name}</p>
+            <p className="panel-colorway">{product.colorway}</p>
+          </div>
+          <button className="panel-close" onClick={onClose}><IconX /></button>
+        </div>
+        <p className="panel-label">Select Size</p>
+        <div className="panel-grid">
+          {SIZES.map(s => (
+            <button key={s.eu} className={`panel-item${sel?.eu===s.eu?' active':''}`} onClick={() => setSel(s)}>
+              <span className="p-eu">EU {s.eu}</span>
+              <span className="p-us">US {s.us}</span>
+            </button>
+          ))}
+        </div>
+        <button className="panel-confirm" onClick={() => { if(sel) { onAdd(sel); onClose(); } }}>
+          {sel ? `Add EU ${sel.eu} to Cart` : 'Select a Size'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Store({ setPage, setItemId, cart, setCart, wishlist, setWishlist }) {
+  const [panelProduct, setPanelProduct] = useState(null);
+
+  function addToCart(product, size) {
+    setCart(c => [...c, { ...product, eu: size.eu, us: size.us, cartId: Date.now() }]);
+  }
+
+  const sizes = ['big','medium','small','small','small'];
+
+  return (
+    <div className="store">
+      {panelProduct && (
+        <SizePanel
+          product={panelProduct}
+          onClose={() => setPanelProduct(null)}
+          onAdd={size => addToCart(panelProduct, size)}
+        />
+      )}
+      <div className="store-header">
+        <h1 className="store-title">Store</h1>
+        <span className="store-count">{PRODUCTS.length} products</span>
+      </div>
+      <div className="grid">
+        {PRODUCTS.map((p, i) => {
+          const isWished = wishlist.has(p.id);
+          const size = sizes[i];
+          return (
+            <div key={p.id} className={`tile tile--${size}`}>
+              <div className="tile-img-wrap" onClick={() => { setItemId(p.id); setPage('item'); }}>
+                <img className="tile-img" src={p.img} alt={p.name} />
+                <span className="tile-tag">{p.tag}</span>
+                <button className={`tile-heart${isWished?' wishlisted':''}`} onClick={e => { e.stopPropagation(); setWishlist(w => { const n = new Set(w); n.has(p.id) ? n.delete(p.id) : n.add(p.id); return n; }); }}>
+                  <IconHeart filled={isWished} />
+                </button>
+              </div>
+              <div className="tile-info" onClick={() => { setItemId(p.id); setPage('item'); }}>
+                <p className="tile-brand" style={{color: p.accent}}>{p.brand}</p>
+                <p className="tile-name">{p.name}</p>
+                <p className="tile-colorway">{p.colorway}</p>
+                <div className="tile-bottom">
+                  <p className="tile-price">${p.price.toFixed(2)}</p>
+                  {size === 'big' || size === 'medium' ? (
+                    <button className="tile-cart-btn" onClick={e => { e.stopPropagation(); setPanelProduct(p); }}>Add to Cart</button>
+                  ) : (
+                    <button className="tile-cart-icon" onClick={e => { e.stopPropagation(); setPanelProduct(p); }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ItemDetail({ itemId, setPage, cart, setCart, wishlist, setWishlist }) {
+  const product = PRODUCTS.find(p => p.id === itemId) || PRODUCTS[0];
+  const [thumbIdx, setThumbIdx] = useState(0);
+  const [selSize, setSelSize] = useState(null);
+  const isWished = wishlist.has(product.id);
+  const imgs = [product.img, PRODUCTS[(PRODUCTS.indexOf(product)+1)%PRODUCTS.length].img];
+
+  function addToCart() {
+    if (!selSize) return;
+    setCart(c => [...c, { ...product, eu: selSize.eu, us: selSize.us, cartId: Date.now() }]);
+  }
+
+  return (
+    <div className="item-page">
+      <button className="back-btn" onClick={() => setPage('store')}>
+        <IconChevL /> Back to Store
+      </button>
+      <div className="item-layout">
+        <div className="gallery">
+          <div className="gallery-main">
+            <img className="gallery-img" src={imgs[thumbIdx]} alt={product.name} />
+          </div>
+          <div className="gallery-thumbs">
+            {imgs.map((src, i) => (
+              <button key={i} className={`gallery-thumb${thumbIdx===i?' active':''}`} onClick={() => setThumbIdx(i)}>
+                <img src={src} alt="" />
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="item-details">
+          <span className="item-tag">{product.tag}</span>
+          <p className="item-brand">{product.brand}</p>
+          <p className="item-name">{product.name}</p>
+          <p className="item-colorway">{product.colorway}</p>
+          <p className="item-price">${product.price.toFixed(2)}</p>
+          <p className="item-desc">{product.desc}</p>
+          <div className="item-sizes">
+            <p className="item-sizes-label">Size</p>
+            <div className="item-size-grid">
+              {SIZES.map(s => (
+                <button key={s.eu} className={`item-size-btn${selSize?.eu===s.eu?' active':''}`} onClick={() => setSelSize(s)}>
+                  <span className="i-eu">EU {s.eu}</span>
+                  <span className="i-us">US {s.us}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="item-actions">
+            <button className="add-to-cart" onClick={addToCart}>
+              {selSize ? 'Add to Cart' : 'Select a Size'}
+            </button>
+            <button className={`wishlist-btn${isWished?' active':''}`} onClick={() => setWishlist(w => { const n = new Set(w); n.has(product.id) ? n.delete(product.id) : n.add(product.id); return n; })}>
+              <IconHeart filled={isWished} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const saved = (() => { try { return localStorage.getItem('ss_page') || 'home'; } catch { return 'home'; } })();
+  const [page, setPageRaw] = useState(saved);
+  const [itemId, setItemId] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState(new Set());
+
+  function setPage(p) { setPageRaw(p); try { localStorage.setItem('ss_page', p); } catch {} }
+
+  return (
+    <>
+      <Nav page={page} setPage={setPage} cart={cart} removeFromCart={id => setCart(c => c.filter(i => i.cartId !== id))} />
+      {page === 'home'  && <HomeHero setPage={setPage} cart={cart} setCart={setCart} />}
+      {page === 'store' && <Store setPage={setPage} setItemId={setItemId} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} />}
+      {page === 'item'  && <ItemDetail itemId={itemId} setPage={setPage} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} />}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+<div id="root"></div>
+</body>
+</html>

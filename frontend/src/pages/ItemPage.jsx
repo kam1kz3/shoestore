@@ -1,15 +1,20 @@
+/**
+ * Item detail. Reads :id from the URL, looks up the catalog entry, applies the
+ * item's accent color to the `--accent*` CSS vars while mounted, and renders
+ * the gallery + size grid + add-to-cart flow. Wishlist heart syncs with the
+ * shared wishlist state owned by App.
+ *
+ * Because React Router keeps the component mounted across /item/:id changes,
+ * per-item state (photoIndex, selectedSize, etc.) is reset in-render via a
+ * `prevId` tracker — React's recommended pattern for reacting to prop changes.
+ */
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getItemImages } from '../utils/itemImages'
 import { loadCatalog } from '../utils/catalog'
+import { effectivePrice, isDiscounted } from '../utils/pricing'
+import { hexToRgba } from '../utils/colors'
 import '../App.css'
-
-function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `rgba(${r},${g},${b},${alpha})`
-}
 
 const sizes = [
   { eu: 39, us: 6.5 },
@@ -25,13 +30,25 @@ function ItemPage({ addToCart, wishlist, toggleWishlist }) {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const item = loadCatalog().find(i => i.id === parseInt(id))
+  const found = loadCatalog().find(i => i.id === parseInt(id))
+  const item = found && found.kind !== 'bundle' ? found : null
   const photos = item ? getItemImages(item.id) : []
 
   const [photoIndex, setPhotoIndex] = useState(0)
   const [selectedSize, setSelectedSize] = useState(null)
   const [sizeError, setSizeError] = useState(false)
   const [added, setAdded] = useState(false)
+
+  // Reset per-item state when the URL changes (React Router keeps the same component
+  // mounted across /item/:id changes). Adjust during render — React's recommended pattern.
+  const [prevId, setPrevId] = useState(id)
+  if (prevId !== id) {
+    setPrevId(id)
+    setPhotoIndex(0)
+    setSelectedSize(null)
+    setSizeError(false)
+    setAdded(false)
+  }
 
   const wishlisted = item && wishlist ? wishlist.includes(item.id) : false
 
@@ -67,7 +84,7 @@ function ItemPage({ addToCart, wishlist, toggleWishlist }) {
       brand: item.brand,
       name: item.name,
       colorway: item.colorway,
-      price: item.price,
+      price: effectivePrice(item),
       sizeEu: size.eu,
       sizeUs: size.us,
     })
@@ -115,7 +132,10 @@ function ItemPage({ addToCart, wishlist, toggleWishlist }) {
           <p className='item-brand'>{item.brand}</p>
           <h1 className='item-name'>{item.name}</h1>
           <p className='item-colorway'>{item.colorway}</p>
-          <p className='item-price'>${item.price.toFixed(2)}</p>
+          <p className='item-price'>
+            {isDiscounted(item) && <span className='price-strike'>${item.price.toFixed(2)}</span>}
+            <span className={isDiscounted(item) ? 'price--sale' : ''}>${effectivePrice(item).toFixed(2)}</span>
+          </p>
           <p className='item-description'>{item.description}</p>
 
           <div className='item-sizes'>
@@ -138,7 +158,7 @@ function ItemPage({ addToCart, wishlist, toggleWishlist }) {
 
           <div className='item-actions'>
             <button className='item-add-to-cart' onClick={handleAddToCart}>
-              {added ? 'Added to Cart ✓' : `Add to Cart — $${item.price.toFixed(2)}`}
+              {added ? 'Added to Cart ✓' : `Add to Cart — $${effectivePrice(item).toFixed(2)}`}
             </button>
             {toggleWishlist && (
               <button

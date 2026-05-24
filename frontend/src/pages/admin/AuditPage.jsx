@@ -1,5 +1,17 @@
+/**
+ * Audit + finance. Two-in-one view:
+ *  - Activity feed merges admin events (from `activityLog`) with order
+ *    events (synthesized from order data — one per order, status-tagged)
+ *    into a single timeline filtered by type + period.
+ *  - Financial sections: summary stats (gross / tax / net / AOV), period
+ *    breakdown (yearly / quarterly / monthly), revenue-by-product, status
+ *    breakdown, and the full filterable ledger.
+ *
+ * Period filter at the top controls both halves.
+ */
 import { useState, useMemo } from 'react'
 import { orders } from '../../data/adminData.js'
+import { loadActivity } from '../../utils/activityLog.js'
 import '../../admin.css'
 
 const TAX_RATE = 0.15
@@ -11,15 +23,6 @@ const statusColor = {
 }
 
 // ── helpers ────────────────────────────────────────────────
-
-function weekLabel(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00')
-  const day = d.getDay()
-  const mon = new Date(d); mon.setDate(d.getDate() - ((day + 6) % 7))
-  const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
-  const fmt = x => x.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-  return `${fmt(mon)} – ${fmt(sun)}`
-}
 
 function groupBy(arr, keyFn) {
   return arr.reduce((acc, item) => {
@@ -39,10 +42,36 @@ const allYears = [...new Set(orders.map(o => o.date.slice(0, 4)))].sort()
 
 // ── component ───────────────────────────────────────────────
 
+// ── Activity feed helpers ──────────────────────────────────
+
+const TYPE_LABEL = {
+  order:   'Order',
+  stock:   'Stock',
+  sale:    'Sale',
+  catalog: 'Catalog',
+  bundle:  'Bundle',
+}
+
+function relativeTime(ts) {
+  const d  = new Date(ts)
+  const now = new Date()
+  const diffMs = now - d
+  const diffMin  = Math.round(diffMs / 60000)
+  const diffHour = Math.round(diffMs / 3600000)
+  const diffDay  = Math.round(diffMs / 86400000)
+  if (diffMin < 1)   return 'just now'
+  if (diffMin < 60)  return `${diffMin} min ago`
+  if (diffHour < 24) return `${diffHour} hour${diffHour === 1 ? '' : 's'} ago`
+  if (diffDay < 7)   return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 function AuditPage() {
-  const [period, setPeriod]           = useState('monthly')   // 'yearly' | 'quarterly' | 'monthly'
+  const [period, setPeriod]             = useState('monthly')   // 'yearly' | 'quarterly' | 'monthly'
   const [selectedYear, setSelectedYear] = useState(allYears[allYears.length - 1])
   const [ledgerFilter, setLedgerFilter] = useState('all')
+  const [activityFilter, setActivityFilter] = useState('all')
+  const [adminEvents] = useState(loadActivity)
 
   // orders scoped to selected year
   const yearOrders = useMemo(
@@ -115,6 +144,40 @@ function AuditPage() {
 
   const periodLabel = period === 'yearly' ? 'All years' : selectedYear
 
+  // ── Merged activity feed: order events + admin events ─────
+  const activityFeed = useMemo(() => {
+    // Order events — synthesize from order data (date + status)
+    const orderEvents = yearOrders.map(o => ({
+      id:    `order-${o.id}`,
+      ts:    `${o.date}T12:00:00.000Z`,  // noon UTC keeps order events stable vs admin times
+      type:  'order',
+      message: `${o.customer} ordered ${o.product} (EU ${o.sizeEu}) — $${o.total.toFixed(2)}`,
+      meta:  { orderId: o.id, status: o.status, total: o.total },
+    }))
+
+    // Admin events — scoped to selected year (or all years if period === 'yearly')
+    const adminScoped = period === 'yearly'
+      ? adminEvents
+      : adminEvents.filter(e => e.ts.startsWith(selectedYear))
+
+    const merged = [...orderEvents, ...adminScoped]
+      .sort((a, b) => b.ts.localeCompare(a.ts))
+
+    return activityFilter === 'all'
+      ? merged
+      : merged.filter(e => e.type === activityFilter)
+  }, [yearOrders, adminEvents, period, selectedYear, activityFilter])
+
+  // Per-type counts for filter chip badges
+  const activityCounts = useMemo(() => {
+    const adminScoped = period === 'yearly'
+      ? adminEvents
+      : adminEvents.filter(e => e.ts.startsWith(selectedYear))
+    const counts = { all: yearOrders.length + adminScoped.length, order: yearOrders.length, stock: 0, sale: 0, catalog: 0, bundle: 0 }
+    for (const e of adminScoped) counts[e.type] = (counts[e.type] || 0) + 1
+    return counts
+  }, [yearOrders, adminEvents, period, selectedYear])
+
   return (
     <div className='admin-page'>
       <div className='admin-page-header'>
@@ -182,6 +245,49 @@ function AuditPage() {
           <p className='admin-stat-label'>Avg. Order Value</p>
           <p className='admin-stat-sub'>{periodLabel}</p>
         </div>
+      </div>
+
+      {/* ── Activity feed ──────────────────────────── */}
+      <div className='admin-card'>
+        <div className='admin-card-top-row'>
+          <p className='admin-card-title'>Activity ({periodLabel})</p>
+          <span className='admin-orders-count'>{activityFeed.length} events</span>
+        </div>
+
+        <div className='admin-activity-filters'>
+          {['all', 'order', 'stock', 'sale', 'catalog', 'bundle'].map(t => (
+            <button
+              key={t}
+              className={`admin-activity-chip${activityFilter === t ? ' admin-activity-chip--active' : ''}`}
+              onClick={() => setActivityFilter(t)}
+            >
+              {t === 'all' ? 'All' : TYPE_LABEL[t]}
+              <span className='admin-activity-chip-count'>{activityCounts[t] || 0}</span>
+            </button>
+          ))}
+        </div>
+
+        {activityFeed.length === 0 ? (
+          <p className='admin-empty'>No activity in this period.</p>
+        ) : (
+          <ul className='admin-activity-list'>
+            {activityFeed.map(e => (
+              <li key={e.id} className={`admin-activity-item admin-activity-item--${e.type}`}>
+                <div className='admin-activity-marker' aria-hidden='true' />
+                <div className='admin-activity-body'>
+                  <div className='admin-activity-top'>
+                    <span className={`admin-activity-type admin-activity-type--${e.type}`}>{TYPE_LABEL[e.type]}</span>
+                    {e.type === 'order' && e.meta?.status && (
+                      <span className={`admin-badge ${statusColor[e.meta.status]}`}>{e.meta.status}</span>
+                    )}
+                    <span className='admin-activity-time'>{relativeTime(e.ts)}</span>
+                  </div>
+                  <p className='admin-activity-message'>{e.message}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className='admin-audit-grid'>

@@ -1,8 +1,16 @@
+/**
+ * Admin dashboard. KPI cards (total stock, total orders, today's orders,
+ * audit shortcut) + recent-orders list + low-stock list. Stock figures read
+ * from the live catalog (`loadCatalog().filter(i => i.kind !== 'bundle')`),
+ * so admin edits in the Stock page reflect here on next mount.
+ *
+ * Order data is still the static seed in adminData.js — there is no order
+ * creation flow.
+ */
 import { useNavigate } from 'react-router-dom'
-import { orders, inventory } from '../../data/adminData.js'
+import { orders } from '../../data/adminData.js'
+import { loadCatalog } from '../../utils/catalog.js'
 import '../../admin.css'
-
-const TODAY = new Date().toISOString().slice(0, 10)
 
 const statusColor = {
   delivered:  'admin-badge--green',
@@ -25,11 +33,13 @@ function StatCard({ label, value, sub, accent, onClick }) {
 
 function DashboardPage() {
   const navigate = useNavigate()
+  const TODAY = new Date().toISOString().slice(0, 10)
 
-  const totalStock   = inventory.reduce((s, i) => s + i.stock, 0)
+  const products     = loadCatalog().filter(i => i.kind !== 'bundle')
+  const totalStock   = products.reduce((s, i) => s + (i.stock || 0), 0)
   const totalOrders  = orders.length
   const todayOrders  = orders.filter(o => o.date === TODAY)
-  const lowStock     = inventory.filter(i => i.stock <= 3)
+  const lowStock     = products.filter(i => (i.stock || 0) <= 3)
   const recentOrders = [...orders].reverse().slice(0, 8)
 
   function goToOrders(date) {

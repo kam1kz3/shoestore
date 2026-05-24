@@ -1,15 +1,16 @@
+/**
+ * Saved-items page. Filters the live catalog by the wishlist id list (owned
+ * by App), so admin edits / new products surface here automatically. Renders
+ * an empty state with a Browse Store CTA when nothing's saved. Bundles are
+ * filtered out — they aren't wishlistable.
+ */
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import SizePanel from '../components/SizePanel'
-import item1 from '../assets/home_display_item_1.png'
-import item2 from '../assets/home_display_item_2.png'
-import item3 from '../assets/home_display_item_3.png'
-import item4 from '../assets/home_display_item_4.png'
-import item5 from '../assets/home_display_item_5.png'
-import homeItems from '../data/homeItems.json'
+import { loadCatalog } from '../utils/catalog'
+import { getItemImages } from '../utils/itemImages'
+import { effectivePrice, isDiscounted } from '../utils/pricing'
 import '../App.css'
-
-const images = [item1, item2, item3, item4, item5]
 
 function WishlistPage({ wishlist, toggleWishlist, addToCart }) {
   const navigate = useNavigate()
@@ -21,7 +22,13 @@ function WishlistPage({ wishlist, toggleWishlist, addToCart }) {
     root.removeProperty('--accent-bg')
     root.removeProperty('--accent-border')
   }, [])
-  const wishlistedItems = homeItems.filter(item => wishlist.includes(item.id))
+
+  // Pull from the live catalog so admin edits / new products surface here.
+  // Bundles aren't wishlistable, so they're filtered out as a safety net.
+  const catalog = loadCatalog()
+  const wishlistedItems = catalog.filter(item =>
+    item.kind !== 'bundle' && wishlist.includes(item.id)
+  )
 
   function handleSizeConfirm(item, size) {
     addToCart({
@@ -30,7 +37,7 @@ function WishlistPage({ wishlist, toggleWishlist, addToCart }) {
       brand: item.brand,
       name: item.name,
       colorway: item.colorway,
-      price: item.price,
+      price: effectivePrice(item),
       sizeEu: size.eu,
       sizeUs: size.us,
     })
@@ -64,44 +71,44 @@ function WishlistPage({ wishlist, toggleWishlist, addToCart }) {
         </div>
       ) : (
         <div className='wishlist-grid'>
-          {wishlistedItems.map(item => {
-            const imgIndex = homeItems.findIndex(i => i.id === item.id)
-            return (
-              <Link key={item.id} to={`/item/${item.id}`} className='wishlist-card'>
-                <div className='wishlist-card-image-wrap'>
-                  <img
-                    src={images[imgIndex]}
-                    alt={item.name}
-                    className='wishlist-card-image'
-                  />
-                  <button
-                    className='wishlist-card-heart wishlist-card-heart--active'
-                    onClick={e => { e.preventDefault(); e.stopPropagation(); toggleWishlist(item.id) }}
-                    aria-label='Remove from wishlist'
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                  </button>
-                  {item.tag && <span className='wishlist-card-tag'>{item.tag}</span>}
-                </div>
+          {wishlistedItems.map(item => (
+            <Link key={item.id} to={`/item/${item.id}`} className='wishlist-card'>
+              <div className='wishlist-card-image-wrap'>
+                <img
+                  src={getItemImages(item.id)[0]}
+                  alt={item.name}
+                  className='wishlist-card-image'
+                />
+                <button
+                  className='wishlist-card-heart wishlist-card-heart--active'
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); toggleWishlist(item.id) }}
+                  aria-label='Remove from wishlist'
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </button>
+                {item.tag && <span className='wishlist-card-tag'>{item.tag}</span>}
+              </div>
 
-                <div className='wishlist-card-info'>
-                  <div className='wishlist-card-text'>
-                    <p className='wishlist-card-brand'>{item.brand}</p>
-                    <p className='wishlist-card-name'>{item.name}</p>
-                    <p className='wishlist-card-colorway'>{item.colorway}</p>
-                  </div>
-                  <div className='wishlist-card-footer'>
-                    <p className='wishlist-card-price'>${item.price.toFixed(2)}</p>
-                    <button className='wishlist-card-cart-btn' onClick={e => { e.preventDefault(); e.stopPropagation(); setSizeTarget(item) }}>
-                      Add to Cart
-                    </button>
-                  </div>
+              <div className='wishlist-card-info'>
+                <div className='wishlist-card-text'>
+                  <p className='wishlist-card-brand'>{item.brand}</p>
+                  <p className='wishlist-card-name'>{item.name}</p>
+                  <p className='wishlist-card-colorway'>{item.colorway}</p>
                 </div>
-              </Link>
-            )
-          })}
+                <div className='wishlist-card-footer'>
+                  <p className='wishlist-card-price'>
+                    {isDiscounted(item) && <span className='price-strike'>${item.price.toFixed(2)}</span>}
+                    <span className={isDiscounted(item) ? 'price--sale' : ''}>${effectivePrice(item).toFixed(2)}</span>
+                  </p>
+                  <button className='wishlist-card-cart-btn' onClick={e => { e.preventDefault(); e.stopPropagation(); setSizeTarget(item) }}>
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       )}
     </div>

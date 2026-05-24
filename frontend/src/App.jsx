@@ -1,6 +1,18 @@
+/**
+ * App entry — owns the two router trees (storefront + admin) and the
+ * cross-page state that both share (cart, wishlist). Wraps everything in an
+ * ErrorBoundary and a one-shot Splash on first session visit.
+ *
+ * Cart + wishlist live here (not in Context) because only the NavBar reads cart
+ * and only a handful of pages mutate them; prop-passing stays readable. Every
+ * mutation persists to localStorage immediately — there is no backend.
+ */
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import NavigationBar from './components/navigationBar'
+import NavigationBar from './components/NavigationBar'
+import NotFound from './components/NotFound'
+import ErrorBoundary from './components/ErrorBoundary'
+import Splash from './components/Splash'
 import HomePage from './pages/HomePage'
 import StorePage from './pages/StorePage'
 import WishlistPage from './pages/WishlistPage'
@@ -28,6 +40,7 @@ function StoreShell({ cart, addToCart, removeFromCart, wishlist, toggleWishlist 
         <Route path='/item/:id' element={<ItemPage addToCart={addToCart} wishlist={wishlist} toggleWishlist={toggleWishlist} />} />
         <Route path='/profile'  element={<ProfilePage />} />
         <Route path='/support'  element={<SupportPage />} />
+        <Route path='*'         element={<NotFound />} />
       </Routes>
     </>
   )
@@ -79,6 +92,7 @@ function AppRoutes() {
         <Route path='orders'    element={<OrdersPage />} />
         <Route path='stock'     element={<StockPage />} />
         <Route path='audit'     element={<AuditPage />} />
+        <Route path='*'         element={<NotFound />} />
       </Route>
     </Routes>
   ) : (
@@ -87,10 +101,21 @@ function AppRoutes() {
 }
 
 function App() {
+  const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('splashSeen') === '1')
+
+  function handleSplashDone() {
+    sessionStorage.setItem('splashSeen', '1')
+    setSplashDone(true)
+  }
+
+  if (!splashDone) return <Splash onDone={handleSplashDone} />
+
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 

@@ -1,4 +1,11 @@
+/**
+ * Slide-up modal for picking a size when adding a product to cart from the
+ * store grid or wishlist (instead of going to the item detail page). Calls
+ * `onConfirm(item, size)` with the chosen size object. Confirm button shows
+ * the effective price (sale-aware).
+ */
 import { useState } from 'react'
+import { effectivePrice } from '../utils/pricing'
 import '../App.css'
 
 const sizes = [
@@ -54,7 +61,7 @@ function SizePanel({ item, onConfirm, onClose }) {
         </div>
 
         <button className='size-panel-confirm' onClick={handleConfirm}>
-          Add to Cart — ${item.price.toFixed(2)}
+          Add to Cart — ${effectivePrice(item).toFixed(2)}
         </button>
       </div>
     </div>

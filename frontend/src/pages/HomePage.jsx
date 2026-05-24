@@ -1,26 +1,26 @@
+/**
+ * Home carousel — the hero. Resolves `displayOrder` against `loadCatalog()`
+ * at mount, filters out bundles + dangling ids, then steps through the
+ * resulting list. Per-slot accent colors (in localStorage `displayAccentColors`)
+ * drive `--accent` / `--accent-bg` / `--accent-border` for the active slide.
+ *
+ * Falls back to an empty state when admin removes every displayed product.
+ * Supports keyboard nav (prev/next buttons), dot nav, and touch swipe.
+ */
 import { useState, useRef, useEffect } from 'react'
-import item1 from '../assets/home_display_item_1.png'
-import item2 from '../assets/home_display_item_2.png'
-import item3 from '../assets/home_display_item_3.png'
-import item4 from '../assets/home_display_item_4.png'
-import item5 from '../assets/home_display_item_5.png'
-import homeItems from '../data/homeItems.json'
+import { useNavigate } from 'react-router-dom'
+import { loadCatalog, loadDisplayOrder } from '../utils/catalog'
+import { getItemImages } from '../utils/itemImages'
+import { effectivePrice, isDiscounted } from '../utils/pricing'
+import { hexToRgba } from '../utils/colors'
 import '../App.css'
 
-const images = [item1, item2, item3, item4, item5]
-
-const defaultColors = homeItems.map(i => i.accentColor)
-
 function loadColors() {
-  try { return JSON.parse(localStorage.getItem('displayAccentColors')) || defaultColors }
-  catch { return defaultColors }
-}
-
-function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `rgba(${r},${g},${b},${alpha})`
+  try {
+    const stored = JSON.parse(localStorage.getItem('displayAccentColors'))
+    if (Array.isArray(stored)) return stored
+  } catch { /* fall through */ }
+  return []
 }
 
 const sizes = [
@@ -34,13 +34,24 @@ const sizes = [
 ]
 
 function HomePage({ addToCart }) {
+  const navigate = useNavigate()
+
+  // Resolve display order → catalog items. Bundles + missing references are dropped.
+  const [displayItems] = useState(() => {
+    const catalog = loadCatalog()
+    return loadDisplayOrder()
+      .map(id => catalog.find(c => c.id === id))
+      .filter(c => c && c.kind !== 'bundle')
+  })
+
   const [index, setIndex] = useState(0)
   const [selectedSize, setSelectedSize] = useState(null)
   const [sizeError, setSizeError] = useState(false)
   const [accentColors] = useState(loadColors)
 
-  const prev = () => setIndex(i => (i - 1 + images.length) % images.length)
-  const next = () => setIndex(i => (i + 1) % images.length)
+  const len = displayItems.length
+  const prev = () => setIndex(i => (i - 1 + len) % len)
+  const next = () => setIndex(i => (i + 1) % len)
 
   const touchStartX = useRef(null)
 
@@ -55,10 +66,13 @@ function HomePage({ addToCart }) {
     touchStartX.current = null
   }
 
-  const item = homeItems[index]
+  // Pick the active item, clamping the index in case displayItems shrank since mount
+  const safeIndex = len > 0 ? Math.min(index, len - 1) : 0
+  const item = displayItems[safeIndex]
 
   useEffect(() => {
-    const accent = accentColors[index] || defaultColors[index]
+    if (!item) return
+    const accent = accentColors[safeIndex] || item.accentColor || '#08060d'
     const root = document.documentElement.style
     root.setProperty('--accent',        accent)
     root.setProperty('--accent-bg',     hexToRgba(accent, 0.1))
@@ -68,9 +82,10 @@ function HomePage({ addToCart }) {
       root.removeProperty('--accent-bg')
       root.removeProperty('--accent-border')
     }
-  }, [index, accentColors])
+  }, [safeIndex, accentColors, item])
 
   function handleAddToCart() {
+    if (!item) return
     if (!selectedSize) {
       setSizeError(true)
       setTimeout(() => setSizeError(false), 2000)
@@ -83,10 +98,21 @@ function HomePage({ addToCart }) {
       brand: item.brand,
       name: item.name,
       colorway: item.colorway,
-      price: item.price,
+      price: effectivePrice(item),
       sizeEu: size.eu,
       sizeUs: size.us,
     })
+  }
+
+  // Empty state — admin removed every displayed product
+  if (!item) {
+    return (
+      <div className='home-container home-container--empty'>
+        <p className='home-empty-title'>No products on the homepage</p>
+        <p className='home-empty-sub'>Set up your homepage carousel from the admin Stock page.</p>
+        <button className='home-btn home-btn--solid' onClick={() => navigate('/store')}>Browse Store</button>
+      </div>
+    )
   }
 
   return (
@@ -96,19 +122,22 @@ function HomePage({ addToCart }) {
         <p className='home-info-brand'>{item.brand}</p>
         <h1 className='home-info-name'>{item.name}</h1>
         <p className='home-info-colorway'>{item.colorway}</p>
-        <p className='home-info-price'>${item.price.toFixed(2)}</p>
+        <p className='home-info-price'>
+          {isDiscounted(item) && <span className='price-strike'>${item.price.toFixed(2)}</span>}
+          <span className={isDiscounted(item) ? 'price--sale' : ''}>${effectivePrice(item).toFixed(2)}</span>
+        </p>
         <p className='home-info-description'>{item.description}</p>
       </div>
 
       <img
-        key={index}
-        src={images[index]}
+        key={safeIndex}
+        src={getItemImages(item.id)[0]}
         alt={item.name}
         className='home-display-image'
       />
 
       <div className='home-bottom-center'>
-        <button className='home-btn home-btn--outline' onClick={() => {}}>View All</button>
+        <button className='home-btn home-btn--outline' onClick={() => navigate('/store')}>View All</button>
         <button className='home-btn home-btn--solid' onClick={handleAddToCart}>Add to Cart</button>
       </div>
 
@@ -141,24 +170,24 @@ function HomePage({ addToCart }) {
       </div>
 
       <div className='home-nav'>
-        <button className='home-nav-button' onClick={prev} aria-label='Previous'>
+        <button className='home-nav-button' onClick={prev} aria-label='Previous' disabled={len <= 1}>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
 
         <div className='home-nav-dots'>
-          {images.map((_, i) => (
+          {displayItems.map((_, i) => (
             <button
               key={i}
-              className={`home-nav-dot${i === index ? ' home-nav-dot--active' : ''}`}
+              className={`home-nav-dot${i === safeIndex ? ' home-nav-dot--active' : ''}`}
               onClick={() => setIndex(i)}
               aria-label={`Go to item ${i + 1}`}
             />
           ))}
         </div>
 
-        <button className='home-nav-button' onClick={next} aria-label='Next'>
+        <button className='home-nav-button' onClick={next} aria-label='Next' disabled={len <= 1}>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6" />
           </svg>

@@ -1,3 +1,10 @@
+/**
+ * Per-item image store. Admin uploads (data URLs) live in localStorage under
+ * `itemImages`, keyed by item id. For the 5 seed items, a bundled PNG asset
+ * acts as the fallback when no uploads exist. getItemImages() resolves the
+ * effective image list (uploads first, asset second); used by storefront and
+ * by admin in equal measure so both always see the same image.
+ */
 import img1 from '../assets/home_display_item_1.png'
 import img2 from '../assets/home_display_item_2.png'
 import img3 from '../assets/home_display_item_3.png'
@@ -12,7 +19,7 @@ export function getItemImages(itemId) {
     const stored = JSON.parse(localStorage.getItem('itemImages')) || {}
     const uploaded = stored[itemId]
     if (uploaded?.length) return uploaded
-  } catch {}
+  } catch { /* fall through to default */ }
   const asset = ASSET_MAP[itemId]
   return asset ? [asset] : []
 }
@@ -23,7 +30,7 @@ export function saveItemImages(itemId, images) {
     const stored = JSON.parse(localStorage.getItem('itemImages')) || {}
     stored[itemId] = images
     localStorage.setItem('itemImages', JSON.stringify(stored))
-  } catch {}
+  } catch { /* fall through to default */ }
 }
 
 /** Loads the full { [itemId]: [url, ...] } map from localStorage. */

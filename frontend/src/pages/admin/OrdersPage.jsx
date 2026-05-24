@@ -1,11 +1,20 @@
+/**
+ * Order management. Monthly calendar on the left (per-day order dots, click
+ * a day to filter the list below) + filterable+searchable order list on the
+ * right. Per-order completion state is persisted to localStorage and the
+ * toggle is instrumented to push into the activity log.
+ *
+ * Orders themselves are static demo data (`adminData.js`) with dates rebased
+ * each module-load to a sliding window around today.
+ */
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { orders } from '../../data/adminData.js'
+import { logActivity } from '../../utils/activityLog.js'
 import '../../admin.css'
 
 const DAYS   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
-const TODAY  = new Date().toISOString().slice(0, 10)
 
 const statusColor = {
   delivered:  'admin-badge--green',
@@ -20,6 +29,7 @@ function loadCompleted() {
 
 function OrdersPage() {
   const { state } = useLocation()
+  const TODAY = new Date().toISOString().slice(0, 10)
   const initialDate = state?.date || TODAY
   const initYear    = parseInt(initialDate.split('-')[0])
   const initMonth   = parseInt(initialDate.split('-')[1]) - 1
@@ -45,8 +55,16 @@ function OrdersPage() {
   function toggleComplete(orderId) {
     setCompleted(prev => {
       const next = new Set(prev)
-      next.has(orderId) ? next.delete(orderId) : next.add(orderId)
+      const wasComplete = next.has(orderId)
+      if (wasComplete) next.delete(orderId)
+      else next.add(orderId)
       localStorage.setItem('adminOrderCompletion', JSON.stringify([...next]))
+      const order = orders.find(o => o.id === orderId)
+      logActivity({
+        type: 'order',
+        message: `${orderId} marked ${wasComplete ? 'incomplete' : 'complete'}${order ? ` (${order.customer} · ${order.product})` : ''}`,
+        meta: { orderId, complete: !wasComplete },
+      })
       return next
     })
   }
@@ -220,7 +238,7 @@ function OrdersPage() {
                       className={`admin-complete-btn${completed.has(o.id) ? ' admin-complete-btn--done' : ''}`}
                       onClick={() => toggleComplete(o.id)}
                     >
-                      {completed.has(o.id) ? 'Complete' : 'Incomplete'}
+                      {completed.has(o.id) ? 'Mark Incomplete' : 'Mark Complete'}
                     </button>
                   </td>
                 </tr>

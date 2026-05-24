@@ -1,5 +1,14 @@
+/**
+ * Sticky top navigation. Holds the slide-out cart dropdown (line-item list +
+ * total) and the menu dropdown (page links + wishlist + sign out). Both
+ * dropdowns close on outside-click and on cross-dropdown open.
+ *
+ * Cart total sums `item.price` from each cart entry — the price is the value
+ * captured at add-time, so sale prices stay locked even if admin removes the
+ * sale later.
+ */
 import { useState, useRef, useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import '../App.css'
 
 const pages = [
@@ -28,7 +37,9 @@ function NavigationBar({ cart, removeFromCart, wishlistCount }) {
 
   return (
     <div className='nav-bar-container'>
-      <div className='nav-bar-left' />
+      <div className='nav-bar-left'>
+        <Link to='/' className='nav-bar-logo'>SoleStore</Link>
+      </div>
 
       <div className='nav-bar-center'>
         {pages.map(({ label, path }) => (
@@ -73,7 +84,13 @@ function NavigationBar({ cart, removeFromCart, wishlistCount }) {
                       <div key={item.cartId} className='nav-cart-item'>
                         <div className='nav-cart-item-info'>
                           <p className='nav-cart-item-name'>{item.name}</p>
-                          <p className='nav-cart-item-sub'>{item.colorway} &middot; EU {item.sizeEu} / US {item.sizeUs}</p>
+                          {item.kind === 'bundle' ? (
+                            <p className='nav-cart-item-sub'>
+                              Bundle &middot; {item.items.length} item{item.items.length === 1 ? '' : 's'}
+                            </p>
+                          ) : (
+                            <p className='nav-cart-item-sub'>{item.colorway} &middot; EU {item.sizeEu} / US {item.sizeUs}</p>
+                          )}
                         </div>
                         <div className='nav-cart-item-right'>
                           <p className='nav-cart-item-price'>${item.price.toFixed(2)}</p>

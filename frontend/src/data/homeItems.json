@@ -2,8 +2,8 @@
   {
     "id": 1,
     "brand": "Travis Scott x Air Jordan",
-    "name": "Jordan Jumpman Jack",
-    "colorway": "TR 'Green Spark'",
+    "name": "Jordan Jumpman Jack TR",
+    "colorway": "'Green Spark'",
     "price": 189.99,
     "tag": "New Arrival",
     "description": "A Travis Scott collaboration reimagining the Jumpman Jack silhouette with earthy tones and signature reversed Swoosh detailing.",
@@ -16,13 +16,13 @@
     "colorway": "'Rise'",
     "price": 174.99,
     "tag": "Best Seller",
-    "description": "The iconic full-length Air unit returns in its most recognizable colorway — reflective silver with bold red accents.",
+    "description": "The iconic silhouette returns in its most recognizable colorway — reflective silver with bold orange accents and premium knit construction.",
     "accentColor": "#e0743a"
   },
   {
     "id": 3,
     "brand": "Nike Kobe Dunk Low",
-    "name": "Proto 'Lower Merion",
+    "name": "Proto 'Lower Merion'",
     "colorway": "'Aces Home'",
     "price": 229.99,
     "tag": "Limited Edition",
@@ -32,7 +32,7 @@
   {
     "id": 4,
     "brand": "Kobe Bryant x Nike Air",
-    "name": "Force 1 low 'Lower",
+    "name": "Force 1 Low 'Lower Merion'",
     "colorway": "'Merion'",
     "price": 199.99,
     "tag": "Heritage",
@@ -46,7 +46,7 @@
     "colorway": "'University Blue'",
     "price": 299.99,
     "tag": "Sale",
-    "description": "Virgil Abloh's deconstructed take on the AF1 classic, featuring exposed foam, zip ties, and signature quotation mark branding.",
+    "description": "Deconstructed take on the AF1 classic, featuring exposed foam, zip ties, and signature quotation mark branding.",
     "accentColor": "#4e8fd4"
   }
 ]

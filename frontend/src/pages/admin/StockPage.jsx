@@ -1,13 +1,29 @@
+/**
+ * Stock management — four tabs:
+ *  - Inventory: CRUD for products (image uploads with Canvas compression,
+ *    inline edit, ± stock buttons, per-item tile-size picker).
+ *  - Bundles:   create / remove promo bundles that group N products at a
+ *    fixed price; shown as big tiles on the storefront.
+ *  - Sales:     toggle individual products on sale and set their sale price.
+ *  - Display:   pick which catalog items appear in the home carousel and
+ *    their per-slot accent colors.
+ *
+ * Every mutation flows through `updateItems` (writes catalog) and emits a
+ * `logActivity({ type, message, meta })` event so the audit page picks it up.
+ * Image uploads are downsampled via Canvas + JPEG re-encoding so 5 images
+ * per item stay well under the localStorage quota.
+ */
 import { useState } from 'react'
 import { loadCatalog, saveCatalog, loadDisplayOrder, saveDisplayOrder } from '../../utils/catalog.js'
-import { loadAllItemImages, saveItemImages } from '../../utils/itemImages.js'
+import { loadAllItemImages, saveItemImages, getItemImages } from '../../utils/itemImages.js'
+import { logActivity } from '../../utils/activityLog.js'
 import '../../admin.css'
 
 function loadColors() {
   try {
     const stored = JSON.parse(localStorage.getItem('displayAccentColors'))
     if (Array.isArray(stored) && stored.length) return stored
-  } catch {}
+  } catch { /* fall through to default */ }
   // Fall back to the accent colors of whatever items are in the current display order
   const catalog = loadCatalog()
   return loadDisplayOrder().map(id => catalog.find(i => i.id === id)?.accentColor ?? '#08060d')
@@ -20,6 +36,11 @@ function saveColors(colors) {
 const BLANK_ITEM = {
   brand: '', name: '', colorway: '', price: '', stock: '',
   tag: '', description: '', accentColor: '#08060d', tileSize: 'small',
+}
+
+const BLANK_BUNDLE = {
+  name: '', description: '', tag: 'BUNDLE',
+  bundlePrice: '', accentColor: '#08060d', bundleItemIds: [],
 }
 
 // Downsample + re-encode as JPEG so images stay well within localStorage limits.
@@ -70,6 +91,15 @@ function StockPage() {
   const [dragOver, setDragOver]           = useState(false)
   const [savedImages, setSavedImages]     = useState(loadAllItemImages)
 
+  // Bundle form state
+  const [showAddBundleForm, setShowAddBundleForm] = useState(false)
+  const [newBundle, setNewBundle]                 = useState(BLANK_BUNDLE)
+  const [newBundleImage, setNewBundleImage]       = useState(null)
+  const [editingBundleId, setEditingBundleId]     = useState(null)
+
+  const products = items.filter(i => i.kind !== 'bundle')
+  const bundles  = items.filter(i => i.kind === 'bundle')
+
   // ── Persistence helper — wraps every items mutation ───
   function updateItems(updater) {
     setItems(prev => {
@@ -119,23 +149,65 @@ function StockPage() {
 
   // ── Inventory helpers ──────────────────────────────────
   function updateStock(id, delta) {
-    updateItems(prev => prev.map(i => i.id === id ? { ...i, stock: Math.max(0, i.stock + delta) } : i))
+    updateItems(prev => prev.map(i => {
+      if (i.id !== id) return i
+      const next = Math.max(0, i.stock + delta)
+      if (next !== i.stock) {
+        logActivity({
+          type: 'stock',
+          message: `Stock for ${i.name}: ${i.stock} → ${next}`,
+          meta: { itemId: id, from: i.stock, to: next },
+        })
+      }
+      return { ...i, stock: next }
+    }))
   }
 
   function removeItem(id) {
-    updateItems(prev => prev.filter(i => i.id !== id))
-    setDisplayOrder(prev => {
-      const filtered = prev.filter(d => d !== id)
-      saveDisplayOrder(filtered)
-      return filtered
-    })
+    const target = items.find(i => i.id === id)
+    if (target) {
+      logActivity({
+        type: 'catalog',
+        message: `Removed ${target.kind === 'bundle' ? 'bundle' : 'product'}: ${target.name}`,
+        meta: { itemId: id },
+      })
+    }
+    updateItems(prev => prev
+      .filter(i => i.id !== id)
+      .map(i => i.kind === 'bundle'
+        ? { ...i, bundleItemIds: (i.bundleItemIds || []).filter(bid => bid !== id) }
+        : i
+      )
+    )
+    // Keep displayOrder + displayAccentColors aligned by dropping the same slot from both.
+    const slotIdx = displayOrder.indexOf(id)
+    if (slotIdx !== -1) {
+      setDisplayOrder(prev => {
+        const next = prev.filter(d => d !== id)
+        saveDisplayOrder(next)
+        return next
+      })
+      setDisplayColors(prev => {
+        const next = prev.filter((_, i) => i !== slotIdx)
+        saveColors(next)
+        return next
+      })
+    }
   }
 
   function saveEdit(id, field, value) {
-    updateItems(prev => prev.map(i => i.id === id
-      ? { ...i, [field]: field === 'price' ? parseFloat(value) || 0 : value }
-      : i
-    ))
+    updateItems(prev => prev.map(i => {
+      if (i.id !== id) return i
+      const next = field === 'price' ? (parseFloat(value) || 0) : value
+      if (i[field] !== next) {
+        logActivity({
+          type: 'catalog',
+          message: `Edited ${i.name}: ${field} ${i[field]} → ${next}`,
+          meta: { itemId: id, field, from: i[field], to: next },
+        })
+      }
+      return { ...i, [field]: next }
+    }))
   }
 
   // imagesToSave is passed explicitly from the button click to avoid the React
@@ -157,22 +229,131 @@ function StockPage() {
       onSale:    false,
       salePrice: null,
     }])
+    logActivity({
+      type: 'catalog',
+      message: `Added product: ${newItem.brand} · ${newItem.name}`,
+      meta: { itemId: id, brand: newItem.brand, name: newItem.name },
+    })
     if (imagesToSave?.length) persistImages(id, imagesToSave)
     setNewItem(BLANK_ITEM)
     setNewImages([])
     setShowAddForm(false)
   }
 
-  // ── Sales helpers ──────────────────────────────────────
-  function toggleSale(id) {
-    updateItems(prev => prev.map(i => i.id === id
-      ? { ...i, onSale: !i.onSale, salePrice: i.onSale ? null : i.salePrice }
-      : i
+  // ── Bundle helpers ─────────────────────────────────────
+  function handleNewBundleImageUpload(e) {
+    const file = e.target.files[0]
+    if (!file || !file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = ev => compressImage(ev.target.result).then(setNewBundleImage)
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+
+  function handleEditBundleImageUpload(bundleId, e) {
+    const file = e.target.files[0]
+    if (!file || !file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = ev => compressImage(ev.target.result).then(compressed => {
+      persistImages(bundleId, [compressed])
+    })
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+
+  function toggleNewBundleItem(itemId) {
+    setNewBundle(p => ({
+      ...p,
+      bundleItemIds: p.bundleItemIds.includes(itemId)
+        ? p.bundleItemIds.filter(i => i !== itemId)
+        : [...p.bundleItemIds, itemId],
+    }))
+  }
+
+  function toggleExistingBundleItem(bundleId, itemId) {
+    updateItems(prev => prev.map(b => {
+      if (b.id !== bundleId) return b
+      const ids = b.bundleItemIds || []
+      return {
+        ...b,
+        bundleItemIds: ids.includes(itemId) ? ids.filter(i => i !== itemId) : [...ids, itemId],
+      }
+    }))
+  }
+
+  function saveBundleEdit(id, field, value) {
+    updateItems(prev => prev.map(b => b.id === id
+      ? { ...b, [field]: field === 'bundlePrice' ? (parseFloat(value) || 0) : value }
+      : b
     ))
   }
 
+  function addBundle(imageToSave) {
+    if (!newBundle.name || !newBundle.bundleItemIds.length) return
+    const id = Math.max(...items.map(i => i.id), 0) + 1
+    updateItems(prev => [...prev, {
+      id,
+      kind: 'bundle',
+      name:          newBundle.name,
+      description:   newBundle.description,
+      tag:           newBundle.tag || 'BUNDLE',
+      bundlePrice:   parseFloat(newBundle.bundlePrice) || 0,
+      accentColor:   newBundle.accentColor || '#08060d',
+      bundleItemIds: newBundle.bundleItemIds,
+      tileSize:      'big',
+    }])
+    logActivity({
+      type: 'bundle',
+      message: `Created bundle "${newBundle.name}" with ${newBundle.bundleItemIds.length} item${newBundle.bundleItemIds.length === 1 ? '' : 's'}`,
+      meta: { bundleId: id, itemIds: newBundle.bundleItemIds, price: parseFloat(newBundle.bundlePrice) || 0 },
+    })
+    if (imageToSave) persistImages(id, [imageToSave])
+    setNewBundle(BLANK_BUNDLE)
+    setNewBundleImage(null)
+    setShowAddBundleForm(false)
+  }
+
+  function removeBundle(id) {
+    const target = items.find(i => i.id === id)
+    if (target) {
+      logActivity({
+        type: 'bundle',
+        message: `Removed bundle "${target.name}"`,
+        meta: { bundleId: id },
+      })
+    }
+    updateItems(prev => prev.filter(b => b.id !== id))
+  }
+
+  // ── Sales helpers ──────────────────────────────────────
+  function toggleSale(id) {
+    updateItems(prev => prev.map(i => {
+      if (i.id !== id) return i
+      const nextOnSale = !i.onSale
+      logActivity({
+        type: 'sale',
+        message: nextOnSale
+          ? `${i.name} put on sale${i.salePrice ? ` at $${i.salePrice.toFixed(2)}` : ''}`
+          : `${i.name} taken off sale`,
+        meta: { itemId: id, onSale: nextOnSale, salePrice: nextOnSale ? i.salePrice : null },
+      })
+      return { ...i, onSale: nextOnSale, salePrice: i.onSale ? null : i.salePrice }
+    }))
+  }
+
   function setSalePrice(id, value) {
-    updateItems(prev => prev.map(i => i.id === id ? { ...i, salePrice: parseFloat(value) || null } : i))
+    updateItems(prev => prev.map(i => {
+      if (i.id !== id) return i
+      const next = parseFloat(value) || null
+      if (next !== i.salePrice && next != null) {
+        logActivity({
+          type: 'sale',
+          message: `Sale price for ${i.name}: $${next.toFixed(2)}`,
+          meta: { itemId: id, salePrice: next },
+        })
+      }
+      return { ...i, salePrice: next }
+    }))
   }
 
   // ── Display helpers ────────────────────────────────────
@@ -213,7 +394,7 @@ function StockPage() {
 
       {/* Tabs */}
       <div className='admin-tabs'>
-        {['inventory', 'sales', 'display'].map(t => (
+        {['inventory', 'bundles', 'sales', 'display'].map(t => (
           <button
             key={t}
             className={`admin-tab${tab === t ? ' admin-tab--active' : ''}`}
@@ -311,6 +492,9 @@ function StockPage() {
             </div>
           )}
 
+          {products.length === 0 ? (
+            <p className='admin-table-muted' style={{margin:'20px 0 0'}}>No products yet. Click <strong>+ Add Item</strong> to create your first one.</p>
+          ) : (
           <table className='admin-table'>
             <thead>
               <tr>
@@ -325,9 +509,10 @@ function StockPage() {
               </tr>
             </thead>
             <tbody>
-              {items.map(item => {
-                const imgs = savedImages[item.id] || []
-                const isEditing = editingId === item.id
+              {products.map(item => {
+                const imgs           = savedImages[item.id] || []   // admin uploads only
+                const effectiveImage = getItemImages(item.id)[0]    // what customers see (upload → bundled fallback)
+                const isEditing      = editingId === item.id
                 return (
                   <tr key={item.id}>
                     {/* Image column */}
@@ -340,6 +525,16 @@ function StockPage() {
                               <button onClick={() => removeEditImage(item.id, i)} type='button'>×</button>
                             </div>
                           ))}
+                          {/* Bundled fallback — read-only placeholder shown while no uploads exist */}
+                          {imgs.length === 0 && effectiveImage && (
+                            <div
+                              className='admin-img-edit-thumb admin-img-edit-thumb--default'
+                              title='Default image — upload to replace'
+                            >
+                              <img src={effectiveImage} alt='Default' />
+                              <span className='admin-img-edit-default-label'>Default</span>
+                            </div>
+                          )}
                           {imgs.length < 5 && (
                             <>
                               <label className='admin-img-edit-add' htmlFor={`edit-img-${item.id}`} title='Add image'>
@@ -350,8 +545,8 @@ function StockPage() {
                           )}
                         </div>
                       ) : (
-                        imgs[0]
-                          ? <img src={imgs[0]} alt={item.name} className='admin-item-thumb' />
+                        effectiveImage
+                          ? <img src={effectiveImage} alt={item.name} className='admin-item-thumb' />
                           : <div className='admin-item-thumb-empty'>—</div>
                       )}
                     </td>
@@ -408,6 +603,215 @@ function StockPage() {
               })}
             </tbody>
           </table>
+          )}
+        </div>
+      )}
+
+      {/* ── Bundles tab ── */}
+      {tab === 'bundles' && (
+        <div className='admin-card'>
+          <div className='admin-card-top-row'>
+            <p className='admin-card-title'>Promos &amp; Bundles</p>
+            <button
+              className='admin-btn admin-btn--solid'
+              onClick={() => { setShowAddBundleForm(v => !v); setNewBundle(BLANK_BUNDLE); setNewBundleImage(null) }}
+            >
+              {showAddBundleForm ? 'Cancel' : '+ Add Bundle'}
+            </button>
+          </div>
+
+          {showAddBundleForm && (
+            <div className='admin-add-form'>
+              <input
+                className='admin-input'
+                placeholder='Bundle name *  e.g. Track Pack'
+                value={newBundle.name}
+                onChange={e => setNewBundle(p => ({...p, name: e.target.value}))}
+              />
+              <textarea
+                className='admin-input'
+                placeholder='Description (optional)'
+                value={newBundle.description}
+                onChange={e => setNewBundle(p => ({...p, description: e.target.value}))}
+                rows={3}
+                style={{resize:'vertical'}}
+              />
+              <input
+                className='admin-input'
+                placeholder='Tag (default BUNDLE)'
+                value={newBundle.tag}
+                onChange={e => setNewBundle(p => ({...p, tag: e.target.value}))}
+              />
+              <input
+                className='admin-input'
+                placeholder='Bundle price *'
+                type='number'
+                value={newBundle.bundlePrice}
+                onChange={e => setNewBundle(p => ({...p, bundlePrice: e.target.value}))}
+              />
+              <div style={{display:'flex', alignItems:'center', gap:10, fontSize:13, color:'var(--admin-muted,#888)'}}>
+                <span>Accent Colour</span>
+                <input
+                  type='color'
+                  className='admin-color-picker'
+                  value={newBundle.accentColor}
+                  onChange={e => setNewBundle(p => ({...p, accentColor: e.target.value}))}
+                />
+              </div>
+
+              {/* Single-image uploader */}
+              <div className='admin-bundle-image-row'>
+                <label className='admin-bundle-image-zone' htmlFor='new-bundle-image'>
+                  {newBundleImage ? (
+                    <img src={newBundleImage} alt='Bundle preview' className='admin-bundle-image-preview' />
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                      </svg>
+                      <span>Click to upload display image</span>
+                      <span className='admin-upload-hint'>PNG or JPG · single image</span>
+                    </>
+                  )}
+                </label>
+                <input
+                  id='new-bundle-image'
+                  type='file'
+                  accept='image/*'
+                  style={{display:'none'}}
+                  onChange={handleNewBundleImageUpload}
+                />
+                {newBundleImage && (
+                  <button className='admin-action-btn' type='button' onClick={() => setNewBundleImage(null)}>Clear image</button>
+                )}
+              </div>
+
+              {/* Item picker */}
+              <p className='admin-card-sub' style={{margin:'4px 0 0'}}>Items in this bundle</p>
+              <div className='admin-bundle-picker'>
+                {products.length === 0 && (
+                  <p className='admin-table-muted' style={{margin:0}}>Add at least one product first.</p>
+                )}
+                {products.map(p => {
+                  const checked = newBundle.bundleItemIds.includes(p.id)
+                  return (
+                    <label key={p.id} className={`admin-bundle-pick${checked ? ' admin-bundle-pick--on' : ''}`}>
+                      <input
+                        type='checkbox'
+                        checked={checked}
+                        onChange={() => toggleNewBundleItem(p.id)}
+                      />
+                      <span className='admin-bundle-pick-name'>{p.name}</span>
+                      <span className='admin-bundle-pick-sub'>{p.brand} · ${p.price.toFixed(2)}</span>
+                    </label>
+                  )
+                })}
+              </div>
+
+              <button className='admin-btn admin-btn--solid' onClick={() => addBundle(newBundleImage)}>Save Bundle</button>
+            </div>
+          )}
+
+          {bundles.length === 0 ? (
+            <p className='admin-table-muted' style={{margin:'20px 0 0'}}>No bundles yet. Create one to feature promos on the store page.</p>
+          ) : (
+            <table className='admin-table'>
+              <thead>
+                <tr>
+                  <th style={{width: 56}}>Image</th>
+                  <th>Name</th>
+                  <th>Items</th>
+                  <th>Price</th>
+                  <th>Tag</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bundles.map(bundle => {
+                  const imgs = savedImages[bundle.id] || []
+                  const isEditing = editingBundleId === bundle.id
+                  const constituents = (bundle.bundleItemIds || [])
+                    .map(id => products.find(p => p.id === id))
+                    .filter(Boolean)
+                  return (
+                    <tr key={bundle.id}>
+                      <td>
+                        {isEditing ? (
+                          <div className='admin-img-edit'>
+                            {imgs[0] && (
+                              <div className='admin-img-edit-thumb'>
+                                <img src={imgs[0]} alt='' />
+                                <button onClick={() => persistImages(bundle.id, [])} type='button'>×</button>
+                              </div>
+                            )}
+                            {!imgs[0] && (
+                              <>
+                                <label className='admin-img-edit-add' htmlFor={`edit-bundle-img-${bundle.id}`} title='Add image'>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                </label>
+                                <input id={`edit-bundle-img-${bundle.id}`} type='file' accept='image/*' style={{display:'none'}} onChange={e => handleEditBundleImageUpload(bundle.id, e)} />
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          imgs[0]
+                            ? <img src={imgs[0]} alt={bundle.name} className='admin-item-thumb' />
+                            : <div className='admin-item-thumb-empty'>—</div>
+                        )}
+                      </td>
+                      <td>
+                        {isEditing
+                          ? <input className='admin-input admin-input--inline' defaultValue={bundle.name} onBlur={e => saveBundleEdit(bundle.id, 'name', e.target.value)} />
+                          : bundle.name}
+                      </td>
+                      <td className='admin-table-muted'>
+                        {isEditing ? (
+                          <div className='admin-bundle-picker admin-bundle-picker--inline'>
+                            {products.map(p => {
+                              const checked = (bundle.bundleItemIds || []).includes(p.id)
+                              return (
+                                <label key={p.id} className={`admin-bundle-pick${checked ? ' admin-bundle-pick--on' : ''}`}>
+                                  <input
+                                    type='checkbox'
+                                    checked={checked}
+                                    onChange={() => toggleExistingBundleItem(bundle.id, p.id)}
+                                  />
+                                  <span className='admin-bundle-pick-name'>{p.name}</span>
+                                </label>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          constituents.length
+                            ? constituents.map(c => c.name).join(', ')
+                            : '—'
+                        )}
+                      </td>
+                      <td>
+                        {isEditing
+                          ? <input className='admin-input admin-input--inline' type='number' defaultValue={bundle.bundlePrice} onBlur={e => saveBundleEdit(bundle.id, 'bundlePrice', e.target.value)} />
+                          : `$${(bundle.bundlePrice || 0).toFixed(2)}`}
+                      </td>
+                      <td>
+                        {isEditing
+                          ? <input className='admin-input admin-input--inline' defaultValue={bundle.tag || ''} onBlur={e => saveBundleEdit(bundle.id, 'tag', e.target.value)} />
+                          : (bundle.tag || 'BUNDLE')}
+                      </td>
+                      <td>
+                        <div className='admin-row-actions'>
+                          <button className='admin-action-btn' onClick={() => setEditingBundleId(isEditing ? null : bundle.id)}>
+                            {isEditing ? 'Done' : 'Edit'}
+                          </button>
+                          <button className='admin-action-btn admin-action-btn--danger' onClick={() => removeBundle(bundle.id)}>Remove</button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
 
@@ -426,10 +830,12 @@ function StockPage() {
               </tr>
             </thead>
             <tbody>
-              {items.map(item => {
-                const discount = item.onSale && item.salePrice
+              {products.map(item => {
+                const validSale = item.salePrice != null && item.salePrice < item.price
+                const discount = item.onSale && validSale
                   ? Math.round((1 - item.salePrice / item.price) * 100)
                   : null
+                const invalid = item.salePrice != null && item.salePrice >= item.price
                 return (
                   <tr key={item.id}>
                     <td>
@@ -446,7 +852,13 @@ function StockPage() {
                         onChange={e => setSalePrice(item.id, e.target.value)}
                       />
                     </td>
-                    <td>{discount != null ? <span className='admin-badge admin-badge--green'>{discount}% off</span> : '—'}</td>
+                    <td>
+                      {discount != null
+                        ? <span className='admin-badge admin-badge--green'>{discount}% off</span>
+                        : invalid
+                          ? <span className='admin-badge admin-badge--red'>Must be &lt; ${item.price.toFixed(2)}</span>
+                          : '—'}
+                    </td>
                     <td>
                       <button
                         className={`admin-toggle${item.onSale ? ' admin-toggle--on' : ''}`}
@@ -489,7 +901,7 @@ function StockPage() {
                     value={itemId}
                     onChange={e => swapDisplay(idx, e.target.value)}
                   >
-                    {items.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
+                    {products.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
                   </select>
                   <div className='admin-display-color'>
                     <label className='admin-display-color-label'>Accent</label>

@@ -1,3 +1,8 @@
+/**
+ * Admin shell — fixed dark sidebar with nav links + "Back to Store" footer,
+ * Outlet on the right for the active admin page. The sidebar is the only
+ * always-dark surface in the app; everything else honors prefers-color-scheme.
+ */
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import '../../admin.css'
 

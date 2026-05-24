@@ -1,3 +1,8 @@
+/**
+ * Help / contact form. Pure UI — the "Send" button is a no-op submission
+ * acknowledgement (no backend wired up). FAQ accordion + contact info are
+ * static content.
+ */
 import { useState } from 'react'
 import '../App.css'
 

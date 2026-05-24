@@ -37,17 +37,19 @@ const DEFAULT_CATALOG = homeItemsData.map((h, idx) => {
 export function loadCatalog() {
   try {
     const stored = JSON.parse(localStorage.getItem('adminInventory'))
-    if (Array.isArray(stored) && stored.length) {
+    // Honour an explicit empty array — admin may have removed every item on purpose.
+    // Only fall back to DEFAULT_CATALOG when the key has never been written.
+    if (Array.isArray(stored)) {
       // Normalise older stored items that pre-date the tileSize field
       return stored.map(item => ({ tileSize: 'small', ...item }))
     }
-  } catch {}
+  } catch { /* fall through to default */ }
   return DEFAULT_CATALOG
 }
 
 /** Persists the full product catalog to localStorage. */
 export function saveCatalog(items) {
-  try { localStorage.setItem('adminInventory', JSON.stringify(items)) } catch {}
+  try { localStorage.setItem('adminInventory', JSON.stringify(items)) } catch { /* localStorage may be full or disabled */ }
 }
 
 /** Returns the homepage display order (array of item IDs). */
@@ -55,11 +57,11 @@ export function loadDisplayOrder() {
   try {
     const stored = JSON.parse(localStorage.getItem('adminDisplayOrder'))
     if (Array.isArray(stored) && stored.length) return stored
-  } catch {}
+  } catch { /* fall through to default */ }
   return DEFAULT_CATALOG.slice(0, 5).map(i => i.id)
 }
 
 /** Persists the homepage display order to localStorage. */
 export function saveDisplayOrder(order) {
-  try { localStorage.setItem('adminDisplayOrder', JSON.stringify(order)) } catch {}
+  try { localStorage.setItem('adminDisplayOrder', JSON.stringify(order)) } catch { /* localStorage may be full or disabled */ }
 }

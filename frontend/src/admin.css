@@ -21,7 +21,7 @@
 }
 
 .admin-sidebar-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -44,7 +44,7 @@
   gap: 10px;
   padding: 10px 12px;
   border-radius: 6px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 500;
   color: rgba(255,255,255,0.55);
@@ -71,7 +71,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: rgba(255,255,255,0.4);
   text-decoration: none;
@@ -109,7 +109,7 @@
 }
 
 .admin-page-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 24px;
   font-weight: 700;
   color: var(--text-h);
@@ -117,7 +117,7 @@
 }
 
 .admin-page-date {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
   margin: 0;
@@ -175,7 +175,7 @@
 
 .admin-audit-toggle-btn {
   padding: 7px 14px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   background: transparent;
@@ -225,7 +225,7 @@
 }
 
 .admin-stat-value {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 32px;
   font-weight: 700;
   color: var(--text-h);
@@ -234,7 +234,7 @@
 }
 
 .admin-stat-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -244,7 +244,7 @@
 }
 
 .admin-stat-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   color: var(--text);
   margin: 0;
@@ -283,7 +283,7 @@
 }
 
 .admin-card-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 700;
   color: var(--text-h);
@@ -293,14 +293,14 @@
 }
 
 .admin-card-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
   margin: -8px 0 0;
 }
 
 .admin-empty {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
   margin: 0;
@@ -312,7 +312,7 @@
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
 }
 
@@ -355,7 +355,7 @@
 /* ── Badges ────────────────────────────────────────── */
 
 .admin-badge {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
@@ -364,10 +364,10 @@
   text-transform: capitalize;
 }
 
-.admin-badge--green  { background: rgba(52,199,89,0.12);  color: #1a7a35; }
-.admin-badge--blue   { background: rgba(10,132,255,0.12); color: #0a5ac2; }
-.admin-badge--yellow { background: rgba(255,159,10,0.12); color: #a06300; }
-.admin-badge--red    { background: rgba(255,59,48,0.12);  color: #c0392b; }
+.admin-badge--green  { background: var(--status-green-bg);  color: var(--status-green-text); }
+.admin-badge--blue   { background: var(--status-blue-bg);   color: var(--status-blue-text); }
+.admin-badge--yellow { background: var(--status-yellow-bg); color: var(--status-yellow-text); }
+.admin-badge--red    { background: var(--status-red-bg);    color: var(--status-red-text); }
 
 /* ── Today list ────────────────────────────────────── */
 
@@ -393,7 +393,7 @@
 }
 
 .admin-today-customer {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-h);
@@ -401,14 +401,14 @@
 }
 
 .admin-today-product {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 2px 0 0;
 }
 
 .admin-today-total {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);
@@ -440,7 +440,7 @@
 }
 
 .admin-lowstock-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-h);
@@ -448,7 +448,7 @@
 }
 
 .admin-lowstock-colorway {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 2px 0 0;
@@ -462,7 +462,7 @@
 }
 
 .admin-tab {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -486,7 +486,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 600;
   color: var(--text-h);
@@ -508,14 +508,14 @@
 
 .admin-stock-btn:hover { background: var(--accent-bg); }
 .admin-stock-btn:disabled { opacity: 0.3; cursor: default; }
-.admin-stock-low { color: #c0392b; font-weight: 700; }
+.admin-stock-low { color: var(--status-red-text); font-weight: 700; }
 
 /* ── Row actions ───────────────────────────────────── */
 
 .admin-row-actions { display: flex; gap: 6px; }
 
 .admin-action-btn {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 600;
   background: transparent;
@@ -527,13 +527,13 @@
 }
 
 .admin-action-btn:hover { background: var(--accent-bg); border-color: var(--accent-border); }
-.admin-action-btn--danger { color: #c0392b; border-color: rgba(192,57,43,0.3); }
-.admin-action-btn--danger:hover { background: rgba(192,57,43,0.08); border-color: rgba(192,57,43,0.5); }
+.admin-action-btn--danger { color: var(--status-danger-text); border-color: var(--status-danger-border); }
+.admin-action-btn--danger:hover { background: var(--status-danger-bg); border-color: var(--status-danger-text); }
 
 /* ── Buttons ───────────────────────────────────────── */
 
 .admin-btn {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -555,7 +555,7 @@
 /* ── Inputs ────────────────────────────────────────── */
 
 .admin-input {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text-h);
   background: var(--bg);
@@ -608,7 +608,7 @@
   user-select: none;
 }
 
-.admin-upload-zone span { font-family: 'Roboto', sans-serif; font-size: 13px; }
+.admin-upload-zone span { font-family: var(--sans); font-size: 13px; }
 .admin-upload-hint { font-size: 11px !important; color: var(--text); opacity: 0.6; }
 
 .admin-upload-zone:hover,
@@ -754,10 +754,32 @@
   color: var(--accent);
 }
 
+/* Bundled-asset placeholder shown when an item has no admin uploads yet.
+   Visually muted + labeled so admins know it's the default, not an upload. */
+.admin-img-edit-thumb--default {
+  border-style: dashed;
+  opacity: 0.72;
+}
+
+.admin-img-edit-default-label {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 /* ── Toggle ────────────────────────────────────────── */
 
 .admin-toggle {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   padding: 4px 12px;
@@ -770,9 +792,9 @@
 }
 
 .admin-toggle--on {
-  background: rgba(52,199,89,0.12);
+  background: var(--status-green-bg);
   border-color: rgba(52,199,89,0.4);
-  color: #1a7a35;
+  color: var(--status-green-text);
 }
 
 /* ── Display tab ───────────────────────────────────── */
@@ -790,7 +812,7 @@
 .admin-display-row:last-child { border-bottom: none; }
 
 .admin-display-position {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 18px;
   font-weight: 700;
   color: var(--text);
@@ -802,7 +824,7 @@
 .admin-display-info { flex: 1; min-width: 0; }
 
 .admin-display-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-h);
@@ -810,7 +832,7 @@
 }
 
 .admin-display-colorway {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 2px 0 0;
@@ -874,7 +896,7 @@
 }
 
 .admin-cal-month {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 16px;
   font-weight: 700;
   color: var(--text-h);
@@ -903,7 +925,7 @@
 }
 
 .admin-cal-day-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -944,7 +966,7 @@
 }
 
 .admin-cal-day-num {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-h);
@@ -984,7 +1006,7 @@
 }
 
 .admin-cal-order-customer {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);
@@ -992,14 +1014,14 @@
 }
 
 .admin-cal-order-product {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 0;
 }
 
 .admin-cal-order-total {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 700;
   color: var(--text-h);
@@ -1011,7 +1033,7 @@
 .admin-orders-card { margin-top: 24px; }
 
 .admin-orders-count {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
 }
@@ -1041,7 +1063,7 @@
 
 .admin-orders-search {
   width: 100%;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text-h);
   background: var(--bg);
@@ -1064,7 +1086,7 @@
 .admin-orders-filter { min-width: 130px; }
 
 .admin-complete-btn {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1093,4 +1115,224 @@
 
 .admin-orders-row--done td {
   opacity: 0.45;
+}
+
+/* ── Bundle form ───────────────────────────────────── */
+
+.admin-bundle-image-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-bundle-image-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px;
+  border: 1.5px dashed var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 13px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.admin-bundle-image-zone:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.admin-bundle-image-preview {
+  max-width: 220px;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.admin-bundle-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.admin-bundle-picker--inline {
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.admin-bundle-pick {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.admin-bundle-pick:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.admin-bundle-pick--on {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.admin-bundle-pick input {
+  cursor: pointer;
+  margin: 0;
+}
+
+.admin-bundle-pick-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+  grid-column: 2;
+}
+
+.admin-bundle-pick-sub {
+  font-size: 11px;
+  color: var(--text);
+  grid-column: 2;
+}
+
+/* ── Activity feed ─────────────────────────────────── */
+
+.admin-activity-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 14px;
+}
+
+.admin-activity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.admin-activity-chip:hover {
+  border-color: var(--accent-border);
+  color: var(--text-h);
+}
+
+.admin-activity-chip--active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--text-h);
+}
+
+.admin-activity-chip-count {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--bg2);
+  color: var(--text);
+}
+
+.admin-activity-chip--active .admin-activity-chip-count {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.admin-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-activity-item {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.admin-activity-item:last-child {
+  border-bottom: none;
+}
+
+.admin-activity-marker {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 6px;
+  background: var(--text);
+  justify-self: center;
+  flex-shrink: 0;
+}
+
+.admin-activity-item--order   .admin-activity-marker { background: var(--status-blue-text); }
+.admin-activity-item--stock   .admin-activity-marker { background: var(--status-yellow-text); }
+.admin-activity-item--sale    .admin-activity-marker { background: var(--status-green-text); }
+.admin-activity-item--catalog .admin-activity-marker { background: var(--product-purple); }
+.admin-activity-item--bundle  .admin-activity-marker { background: var(--product-orange); }
+
+.admin-activity-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-activity-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-activity-type {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.admin-activity-type--order   { color: var(--status-blue-text); }
+.admin-activity-type--stock   { color: var(--status-yellow-text); }
+.admin-activity-type--sale    { color: var(--status-green-text); }
+.admin-activity-type--catalog { color: var(--product-purple); }
+.admin-activity-type--bundle  { color: var(--product-orange); }
+
+.admin-activity-time {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--text);
+}
+
+.admin-activity-message {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  margin: 0;
+  word-break: break-word;
 }

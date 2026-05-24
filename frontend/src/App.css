@@ -2,12 +2,30 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  height: 10vh;
+  height: 56px;
   width: 100%;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
 }
 
 .nav-bar-left {
   flex: 1;
+  padding-left: 24px;
+}
+
+.nav-bar-logo {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-h);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
 }
 
 .nav-bar-center {
@@ -30,22 +48,27 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-family: var(--sans);
+  font-size: 13px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   background: transparent;
   border: none;
-  padding: 6px 16px;
+  padding: 0 16px;
   cursor: pointer;
-  color: inherit;
+  color: var(--text);
+  height: 56px;
   position: relative;
-  transition: opacity 0.2s ease;
+  transition: color 0.15s ease;
 }
 
 .nav-bar-button:hover {
-  opacity: 0.6;
+  color: var(--text-h);
+}
+
+.nav-bar-button--active {
+  color: var(--text-h);
 }
 
 .nav-bar-button::after {
@@ -120,7 +143,7 @@
   border-radius: 999px;
   background: var(--accent-bg);
   color: var(--accent);
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 10px;
   font-weight: 700;
   display: flex;
@@ -175,7 +198,7 @@
 }
 
 .nav-cart-item-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-h);
@@ -186,7 +209,7 @@
 }
 
 .nav-cart-item-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   color: var(--text);
   margin: 0;
@@ -201,7 +224,7 @@
 }
 
 .nav-cart-item-price {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);
@@ -221,7 +244,7 @@
 }
 
 .nav-cart-item-remove:hover {
-  color: #e53e3e;
+  color: var(--status-danger-text);
 }
 
 .nav-cart-footer {
@@ -233,7 +256,7 @@
 }
 
 .nav-cart-total-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 500;
   text-transform: uppercase;
@@ -242,14 +265,14 @@
 }
 
 .nav-cart-total {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 15px;
   font-weight: 700;
   color: var(--text-h);
 }
 
 .nav-dropdown-empty {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-h);
@@ -257,7 +280,7 @@
 }
 
 .nav-dropdown-empty-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 0;
@@ -272,7 +295,7 @@
 }
 
 .nav-dropdown-item {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 400;
   background: transparent;
@@ -296,7 +319,7 @@
 }
 
 .nav-dropdown-item--signout {
-  color: #e53e3e;
+  color: var(--status-danger-text);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -336,7 +359,7 @@
 }
 
 .home-info-tag {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -350,7 +373,7 @@
 }
 
 .home-info-brand {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.12em;
@@ -360,7 +383,7 @@
 }
 
 .home-info-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 36px;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -370,7 +393,7 @@
 }
 
 .home-info-colorway {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 400;
   color: var(--text);
@@ -378,7 +401,7 @@
 }
 
 .home-info-price {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 22px;
   font-weight: 500;
   color: var(--text-h);
@@ -386,7 +409,7 @@
 }
 
 .home-info-description {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   line-height: 1.6;
   color: var(--text);
@@ -471,7 +494,7 @@
 }
 
 .home-btn {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -515,7 +538,7 @@
 }
 
 .home-sizes-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -526,7 +549,7 @@
 }
 
 .home-sizes-label--error {
-  color: #e53e3e;
+  color: var(--status-danger-text);
 }
 
 .home-sizes-scroll--error .home-size-item {
@@ -548,7 +571,7 @@
 
 .home-sizes-select {
   display: none;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text-h);
   background: var(--bg);
@@ -600,7 +623,7 @@
 }
 
 .home-size-eu {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);
@@ -608,7 +631,7 @@
 }
 
 .home-size-us {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 10px;
   font-weight: 400;
   color: var(--text);
@@ -648,7 +671,7 @@
 }
 
 .support-section-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -658,7 +681,7 @@
 }
 
 .support-section-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 28px;
   font-weight: 700;
   color: var(--text-h);
@@ -692,7 +715,7 @@
   border: none;
   padding: 18px 0;
   cursor: pointer;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 15px;
   font-weight: 500;
   color: var(--text-h);
@@ -715,7 +738,7 @@
 }
 
 .support-faq-answer {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   line-height: 1.7;
   color: var(--text);
@@ -745,7 +768,7 @@
 }
 
 .support-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -754,7 +777,7 @@
 }
 
 .support-input {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text-h);
   background: transparent;
@@ -782,7 +805,7 @@
 }
 
 .support-submit {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -811,7 +834,7 @@
 }
 
 .support-success-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 18px;
   font-weight: 700;
   color: var(--text-h);
@@ -819,14 +842,14 @@
 }
 
 .support-success-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text);
   margin: 0 0 8px;
 }
 
 .support-success-reset {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -847,7 +870,7 @@
 
 .nav-dropdown-item--page {
   text-decoration: none;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 500;
   text-transform: uppercase;
@@ -1014,7 +1037,7 @@
 }
 
 .store-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -1023,7 +1046,7 @@
 }
 
 .store-count {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
 }
@@ -1032,7 +1055,7 @@
 .store-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 220px;
+  grid-auto-rows: 320px;
   grid-auto-flow: dense;
   gap: 16px;
 }
@@ -1080,7 +1103,7 @@
 }
 
 .store-tile:hover .store-tile-image {
-  transform: scale(1.08) rotate(3deg);
+  transform: scale(1.08);
 }
 
 /* ── Tag badge ── */
@@ -1088,7 +1111,7 @@
   position: absolute;
   bottom: 10px;
   left: 10px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1130,15 +1153,15 @@
 
 /* ── Tile info ── */
 .store-tile-info {
-  padding: 14px 16px 16px;
+  padding: 10px 14px 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  flex: 1;
+  gap: 2px;
+  flex: 0 0 auto;
 }
 
 .store-tile-brand {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -1148,8 +1171,8 @@
 }
 
 .store-tile-name {
-  font-family: 'Roboto', sans-serif;
-  font-size: 15px;
+  font-family: var(--sans);
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-h);
   margin: 0;
@@ -1157,11 +1180,11 @@
 }
 
 .store-tile--small .store-tile-name {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .store-tile-colorway {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 0;
@@ -1171,23 +1194,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .store-tile-price {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-family: var(--sans);
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-h);
   margin: 0;
 }
 
 .store-tile--small .store-tile-price {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .store-tile-cart-btn {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1224,7 +1247,7 @@
 }
 
 .store-tile-description {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   line-height: 1.6;
@@ -1238,7 +1261,7 @@
 
   .store-grid {
     grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 180px;
+    grid-auto-rows: 240px;
   }
 
   .store-tile--big    { grid-column: span 2; grid-row: span 3; }
@@ -1257,7 +1280,7 @@
   background: transparent;
   border: none;
   padding: 10px 16px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-h);
@@ -1307,7 +1330,7 @@
 }
 
 .wishlist-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -1316,7 +1339,7 @@
 }
 
 .wishlist-count {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
 }
@@ -1336,7 +1359,7 @@
 }
 
 .wishlist-empty-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 18px;
   font-weight: 600;
   color: var(--text-h);
@@ -1344,7 +1367,7 @@
 }
 
 .wishlist-empty-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
   margin: 0;
@@ -1353,7 +1376,7 @@
 
 .wishlist-browse-btn {
   margin-top: 8px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1411,7 +1434,7 @@
 }
 
 .wishlist-card:hover .wishlist-card-image {
-  transform: scale(1.08) rotate(3deg);
+  transform: scale(1.08);
 }
 
 .wishlist-card-heart {
@@ -1438,7 +1461,7 @@
   position: absolute;
   bottom: 10px;
   left: 10px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1461,7 +1484,7 @@
 .wishlist-card-text { display: flex; flex-direction: column; gap: 3px; }
 
 .wishlist-card-brand {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1471,7 +1494,7 @@
 }
 
 .wishlist-card-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 600;
   color: var(--text-h);
@@ -1480,7 +1503,7 @@
 }
 
 .wishlist-card-colorway {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 0;
@@ -1494,7 +1517,7 @@
 }
 
 .wishlist-card-price {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 15px;
   font-weight: 700;
   color: var(--text-h);
@@ -1502,7 +1525,7 @@
 }
 
 .wishlist-card-cart-btn {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1574,7 +1597,7 @@
 }
 
 .size-panel-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 16px;
   font-weight: 700;
   color: var(--text-h);
@@ -1582,7 +1605,7 @@
 }
 
 .size-panel-colorway {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 4px 0 0;
@@ -1604,7 +1627,7 @@
 .size-panel-close:hover { color: var(--text-h); }
 
 .size-panel-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1613,7 +1636,7 @@
   margin: 0;
 }
 
-.size-panel-label--error { color: #e05c5c; }
+.size-panel-label--error { color: var(--status-danger-text); }
 
 .size-panel-grid {
   display: grid;
@@ -1645,7 +1668,7 @@
 }
 
 .size-panel-eu {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);
@@ -1654,13 +1677,13 @@
 .size-panel-item--active .size-panel-eu { color: var(--accent); }
 
 .size-panel-us {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 10px;
   color: var(--text);
 }
 
 .size-panel-confirm {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1693,14 +1716,14 @@
 }
 
 .item-not-found-msg {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 16px;
   color: var(--text);
   margin: 0;
 }
 
 .item-not-found-btn {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1718,7 +1741,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
   color: var(--text);
@@ -1766,7 +1789,7 @@
 }
 
 .item-gallery-main:hover .item-gallery-image {
-  transform: scale(1.08) rotate(3deg);
+  transform: scale(1.08);
 }
 
 .item-gallery-thumbs {
@@ -1805,7 +1828,7 @@
 }
 
 .item-tag {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1819,7 +1842,7 @@
 }
 
 .item-brand {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.12em;
@@ -1829,7 +1852,7 @@
 }
 
 .item-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -1839,14 +1862,14 @@
 }
 
 .item-colorway {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text);
   margin: 0;
 }
 
 .item-price {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 24px;
   font-weight: 600;
   color: var(--text-h);
@@ -1854,7 +1877,7 @@
 }
 
 .item-description {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   line-height: 1.7;
   color: var(--text);
@@ -1872,7 +1895,7 @@
 }
 
 .item-sizes-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1882,7 +1905,7 @@
   transition: color 0.15s ease;
 }
 
-.item-sizes-label--error { color: #e53e3e; }
+.item-sizes-label--error { color: var(--status-danger-text); }
 
 .item-sizes-grid {
   display: grid;
@@ -1919,7 +1942,7 @@
 }
 
 .item-size-eu {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);
@@ -1928,7 +1951,7 @@
 .item-size-btn--active .item-size-eu { color: var(--accent); }
 
 .item-size-us {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 10px;
   color: var(--text);
 }
@@ -1944,7 +1967,7 @@
 
 .item-add-to-cart {
   flex: 1;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -2020,7 +2043,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 700;
   color: #fff;
@@ -2042,7 +2065,7 @@
 }
 
 .profile-sidenav-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 600;
   color: var(--text-h);
@@ -2053,7 +2076,7 @@
 }
 
 .profile-sidenav-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   color: var(--text);
   margin: 0;
@@ -2074,7 +2097,7 @@
   background: transparent;
   border: none;
   border-radius: 6px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 400;
   color: var(--text);
@@ -2109,7 +2132,7 @@
 }
 
 .profile-section-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 20px;
   font-weight: 700;
   color: var(--text-h);
@@ -2117,7 +2140,7 @@
 }
 
 .profile-section-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
   margin: 0;
@@ -2126,7 +2149,7 @@
 }
 
 .profile-subsection-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);
@@ -2145,7 +2168,7 @@
 }
 
 .profile-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -2154,7 +2177,7 @@
 }
 
 .profile-input {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text-h);
   background: var(--bg);
@@ -2170,7 +2193,7 @@
 .profile-input:focus { border-color: var(--accent); }
 
 .profile-textarea {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text-h);
   background: var(--bg);
@@ -2189,7 +2212,7 @@
 .profile-textarea:focus { border-color: var(--accent); }
 
 .profile-char-count {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 11px;
   color: var(--text);
   margin: 0;
@@ -2197,7 +2220,7 @@
 }
 
 .profile-select {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text-h);
   background: var(--bg);
@@ -2247,7 +2270,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text-h);
   cursor: pointer;
@@ -2274,7 +2297,7 @@
 .profile-toggle-row:last-of-type { border-bottom: none; }
 
 .profile-toggle-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-h);
@@ -2282,7 +2305,7 @@
 }
 
 .profile-toggle-sub {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 0;
@@ -2322,7 +2345,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -2345,7 +2368,7 @@
 
 /* Password message */
 .profile-pw-msg {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   margin: 0;
   padding: 10px 14px;
@@ -2353,8 +2376,8 @@
   border: 1px solid;
 }
 
-.profile-pw-msg--ok  { color: #2f855a; background: rgba(47,133,90,0.08);  border-color: rgba(47,133,90,0.3); }
-.profile-pw-msg--err { color: #c53030; background: rgba(197,48,48,0.08);  border-color: rgba(197,48,48,0.3); }
+.profile-pw-msg--ok  { color: var(--status-green-text);  background: var(--status-green-bg);  border-color: rgba(47,133,90,0.3); }
+.profile-pw-msg--err { color: var(--status-danger-text); background: var(--status-danger-bg); border-color: var(--status-danger-border); }
 
 /* About section */
 .profile-about-card {
@@ -2367,7 +2390,7 @@
 }
 
 .profile-about-app {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 16px;
   font-weight: 700;
   color: var(--text-h);
@@ -2375,14 +2398,14 @@
 }
 
 .profile-about-version {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--text);
   margin: 0;
 }
 
 .profile-about-build {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   color: var(--text);
   margin: 0;
@@ -2405,7 +2428,7 @@
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--border);
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   color: var(--text-h);
   cursor: pointer;
@@ -2424,26 +2447,26 @@
 }
 
 .profile-danger-label {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #c53030;
+  color: var(--status-danger-text);
   margin: 0;
 }
 
 .profile-danger-btn {
   align-self: flex-start;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 10px 24px;
-  background: rgba(197,48,48,0.08);
-  border: 1px solid rgba(197,48,48,0.3);
-  color: #c53030;
+  background: var(--status-danger-bg);
+  border: 1px solid var(--status-danger-border);
+  color: var(--status-danger-text);
   cursor: pointer;
   border-radius: 4px;
   transition: opacity 0.15s ease;
@@ -2465,4 +2488,380 @@
   .profile-sidenav-item { white-space: nowrap; }
   .profile-content { padding: 24px 16px; }
   .profile-row { flex-direction: column; gap: 16px; }
+}
+
+/* ── Sale pricing ──────────────────────────────────── */
+
+.price-strike {
+  font-size: 0.78em;
+  color: var(--fg2);
+  text-decoration: line-through;
+  font-weight: 400;
+  margin-right: 6px;
+}
+
+.price--sale {
+  color: var(--status-red-text);
+}
+
+/* ── Home empty state ─────────────────────────────── */
+
+.home-container--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 80px 24px;
+  flex: 1;
+}
+
+.home-empty-title {
+  font-family: var(--sans);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  color: var(--fg1);
+  margin: 0;
+}
+
+.home-empty-sub {
+  font-family: var(--sans);
+  font-size: var(--text-base);
+  color: var(--fg2);
+  margin: 0 0 8px;
+}
+
+/* ── Store empty state ────────────────────────────── */
+
+.store-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.store-empty-icon {
+  color: var(--fg3);
+}
+
+.store-empty-title {
+  font-family: var(--sans);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  color: var(--fg1);
+  margin: 0;
+}
+
+.store-empty-sub {
+  font-family: var(--sans);
+  font-size: var(--text-base);
+  color: var(--fg2);
+  margin: 0;
+  max-width: 360px;
+}
+
+/* ── 404 / Not Found ──────────────────────────────── */
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 100px 24px;
+  flex: 1;
+  text-align: center;
+}
+
+.not-found-code {
+  font-family: var(--sans);
+  font-size: 88px;
+  font-weight: var(--weight-bold);
+  letter-spacing: -3px;
+  color: var(--fg3);
+  margin: 0;
+  line-height: 1;
+}
+
+.not-found-title {
+  font-family: var(--sans);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-medium);
+  color: var(--fg1);
+  margin: 8px 0 0;
+}
+
+.not-found-sub {
+  font-family: var(--sans);
+  font-size: var(--text-base);
+  color: var(--fg2);
+  margin: 0 0 16px;
+}
+
+.not-found-path {
+  font-family: var(--mono);
+  font-size: var(--text-sm);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--bg2);
+  color: var(--fg1);
+}
+
+.not-found-cta {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: opacity 0.15s ease;
+}
+
+.not-found-cta:hover { opacity: 0.85; }
+
+.not-found--admin {
+  padding: 80px 24px;
+}
+
+/* ── Error boundary ───────────────────────────────── */
+
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 24px;
+  min-height: 100vh;
+  text-align: center;
+  background: var(--bg);
+  color: var(--fg2);
+}
+
+.error-boundary-icon {
+  color: var(--status-danger-text);
+}
+
+.error-boundary-title {
+  font-family: var(--sans);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-medium);
+  color: var(--fg1);
+  margin: 8px 0 0;
+}
+
+.error-boundary-sub {
+  font-family: var(--sans);
+  font-size: var(--text-base);
+  color: var(--fg2);
+  margin: 0 0 8px;
+}
+
+.error-boundary-detail {
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  max-width: 600px;
+  overflow-x: auto;
+  color: var(--fg2);
+  margin: 0;
+  text-align: left;
+}
+
+.error-boundary-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.error-boundary-btn {
+  font-family: var(--sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 11px 22px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--bg);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: opacity 0.15s ease;
+}
+
+.error-boundary-btn:hover { opacity: 0.85; }
+
+.error-boundary-btn--outline {
+  background: transparent;
+  color: var(--fg1);
+  border-color: var(--border);
+}
+
+/* ── Splash screen ────────────────────────────────── */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--bg);
+  z-index: 9999;
+  animation: splash-in 0.35s ease;
+}
+
+@keyframes splash-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.splash--exit {
+  animation: splash-out 0.3s ease forwards;
+}
+
+@keyframes splash-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.splash-logo {
+  font-family: var(--sans);
+  font-size: 26px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.22em;
+  color: var(--fg1);
+  margin: 0;
+}
+
+.splash-tag {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.3em;
+  color: var(--fg3);
+  margin: 0;
+}
+
+/* ── Bundle tile (storefront) ──────────────────────── */
+
+.store-tile--bundle {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* ── Bundle size panel ─────────────────────────────── */
+
+.size-panel--bundle {
+  max-width: 520px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.bundle-panel-items {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bundle-panel-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.bundle-panel-item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bundle-panel-item-image {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+
+.bundle-panel-item-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.bundle-panel-item-name {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg1);
+  margin: 0;
+}
+
+.bundle-panel-item-colorway {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--fg2);
+  margin: 0;
+}
+
+.bundle-panel-sizes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.bundle-panel-size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.bundle-panel-size:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.bundle-panel-size--active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.bundle-panel-size-eu {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg1);
+}
+
+.bundle-panel-size--active .bundle-panel-size-eu { color: var(--accent); }
+
+.bundle-panel-size-us {
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--fg2);
 }

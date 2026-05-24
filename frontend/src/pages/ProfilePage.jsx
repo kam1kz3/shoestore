@@ -1,3 +1,9 @@
+/**
+ * Customer profile + settings. Four sections (Profile, Preferences, Security,
+ * About) gated by a sidebar nav. Each section reads/writes its own
+ * localStorage key via a generic `loadData(key, defaults)` helper, so adding
+ * a new section is just defining its defaults + form fields.
+ */
 import { useState, useEffect } from 'react'
 import '../App.css'
 

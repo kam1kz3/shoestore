@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoleStore — Hi-Fi Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Roboto',sans-serif;}
+
+/* ── Presentation shell ── */
+body{background:#111;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+.pres{width:100%;display:flex;flex-direction:column;align-items:center;gap:0;}
+
+/* Top bar */
+.topbar{width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;position:sticky;top:0;z-index:999;background:rgba(17,17,17,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.07);}
+.topbar-brand{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.9);}
+.screen-tabs{display:flex;gap:4px;background:rgba(255,255,255,0.07);border-radius:8px;padding:3px;}
+.screen-tab{font-size:12px;font-weight:500;letter-spacing:0.04em;background:transparent;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,0.5);transition:background 0.15s,color 0.15s;white-space:nowrap;}
+.screen-tab.active{background:rgba(255,255,255,0.12);color:#fff;}
+.screen-tab:hover:not(.active){color:rgba(255,255,255,0.75);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.dm-btn{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);padding:6px 12px;border-radius:6px;cursor:pointer;transition:all 0.15s;}
+.dm-btn:hover{background:rgba(255,255,255,0.14);color:#fff;}
+
+/* Browser chrome */
+.browser-wrap{width:100%;max-width:1400px;padding:24px 28px 40px;}
+.chrome{border-radius:10px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.06);}
+.chrome-bar{height:44px;background:#202124;display:flex;align-items:center;gap:0;}
+.chrome-lights{display:flex;gap:6px;padding:0 14px;flex-shrink:0;}
+.chrome-light{width:12px;height:12px;border-radius:50%;}
+.chrome-tab{height:34px;align-self:flex-end;padding:0 14px;display:flex;align-items:center;gap:7px;background:#35363a;border-radius:8px 8px 0 0;min-width:180px;font-size:12px;color:#e8eaed;font-family:system-ui,sans-serif;}
+.chrome-favicon{width:14px;height:14px;border-radius:2px;background:#5f6368;flex-shrink:0;}
+.chrome-tab-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chrome-url-bar{flex:1;margin:0 12px;height:28px;background:#282a2d;border-radius:14px;display:flex;align-items:center;padding:0 12px;gap:6px;}
+.chrome-url-text{font-size:12px;color:#9aa0a6;font-family:system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chrome-lock{color:#9aa0a6;}
+.chrome-content{overflow:hidden;max-height:680px;overflow-y:auto;}
+
+/* ── SoleStore UI tokens ── */
+.ss{--text:#6b6375;--text-h:#08060d;--bg:#fff;--border:#e5e4e7;--bg2:#f4f3ec;--accent:#000;--accent-bg:rgba(8,6,13,0.06);--accent-border:rgba(8,6,13,0.20);--shadow:rgba(0,0,0,0.1) 0 10px 15px -3px,rgba(0,0,0,0.05) 0 4px 6px -2px;}
+.ss.dark{--text:#9ca3af;--text-h:#f3f4f6;--bg:#1E1E1E;--border:#2e303a;--bg2:#1f2028;--accent:#fff;--accent-bg:rgba(255,255,255,0.10);--accent-border:rgba(255,255,255,0.25);}
+.ss{background:var(--bg);color:var(--text);font-family:'Roboto',sans-serif;min-height:680px;transition:background 0.3s,color 0.3s;}
+
+/* ── Nav ── */
+.ss-nav{display:flex;align-items:center;height:56px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;transition:background 0.3s,border-color 0.3s;}
+.ss-nav-left{flex:1;padding-left:28px;}
+.ss-logo{font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-h);background:none;border:none;cursor:pointer;}
+.ss-nav-center{display:flex;}
+.ss-navlink{font-size:13px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;background:transparent;border:none;padding:0 16px;cursor:pointer;color:var(--text);height:56px;position:relative;transition:color 0.15s;}
+.ss-navlink.active{color:var(--text-h);}
+.ss-navlink::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:center;transition:transform 0.25s ease;}
+.ss-navlink.active::after{transform:scaleX(1);}
+.ss-navlink:hover{color:var(--text-h);}
+.ss-nav-right{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:4px;padding-right:20px;}
+.ss-icon-btn{display:flex;align-items:center;justify-content:center;background:transparent;border:none;padding:8px;cursor:pointer;color:var(--text-h);border-radius:4px;position:relative;transition:opacity 0.15s;}
+.ss-icon-btn:hover{opacity:0.6;}
+.ss-cart-badge{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--accent-bg);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+/* ── Home Hero ── */
+.home{position:relative;display:flex;align-items:center;justify-content:center;height:624px;overflow:hidden;background:var(--bg);}
+.home-info{position:absolute;left:48px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;max-width:300px;text-align:left;animation:hinfo 0.4s ease;}
+@keyframes hinfo{from{opacity:0;transform:translateY(calc(-50% + 14px))}to{opacity:1;transform:translateY(-50%)}}
+.h-tag{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:4px;align-self:flex-start;transition:background 0.3s,color 0.3s,border-color 0.3s;}
+.h-brand{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text);margin:0;}
+.h-name{font-size:30px;font-weight:700;letter-spacing:-0.5px;color:var(--text-h);margin:0;line-height:1.1;}
+.h-colorway{font-size:13px;color:var(--text);margin:0;}
+.h-price{font-size:22px;font-weight:600;color:var(--text-h);margin:0;}
+.h-desc{font-size:13px;line-height:1.65;color:var(--text);margin:0;}
+.home-img{position:absolute;right:10%;top:50%;transform:translateY(-50%) scaleX(-1) rotate(22deg);max-height:72%;max-width:48%;object-fit:contain;user-select:none;pointer-events:none;animation:himg 0.45s ease;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.18));}
+@keyframes himg{from{opacity:0;transform:translateY(-50%) scaleX(-1) rotate(22deg) scale(0.92)}to{opacity:1;transform:translateY(-50%) scaleX(-1) rotate(22deg) scale(1)}}
+.home-sizes{position:absolute;bottom:28px;left:48px;display:flex;flex-direction:column;gap:7px;}
+.sizes-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text);margin:0;}
+.sizes-row{display:flex;gap:5px;}
+.size-chip{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 10px;background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background 0.15s,border-color 0.15s,transform 0.15s;}
+.size-chip:hover{background:var(--accent-bg);border-color:var(--accent-border);transform:translateY(-1px);}
+.size-chip.sel{background:var(--text-h);border-color:var(--text-h);}
+.size-chip.sel .s-eu,.size-chip.sel .s-us{color:var(--bg);}
+.s-eu{font-size:12px;font-weight:600;color:var(--text-h);}
+.s-us{font-size:9px;color:var(--text);}
+.home-btns{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:8px;}
+.h-btn{font-size:12px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;padding:10px 26px;border-radius:0;cursor:pointer;transition:opacity 0.15s,transform 0.15s;}
+.h-btn:hover{transform:translateY(-1px);}
+.h-btn:hover{opacity:0.88;}
+.h-btn--outline{background:transparent;border:1px solid var(--border);color:var(--text-h);}
+.h-btn--solid{background:var(--accent);border:1px solid var(--accent);color:var(--bg);}
+.home-captions{position:absolute;bottom:28px;right:28px;display:flex;align-items:center;gap:8px;}
+.nav-circ{display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:transparent;border:1px solid var(--border);border-radius:50%;cursor:pointer;color:var(--text-h);transition:background 0.15s,border-color 0.15s;}
+.nav-circ:hover{background:var(--accent-bg);border-color:var(--accent-border);}
+.dot{width:7px;height:7px;border-radius:50%;border:none;padding:0;cursor:pointer;transition:background 0.2s,transform 0.2s;}
+.dot.on{transform:scale(1.35);}
+
+/* ── Store ── */
+.store-page{padding:36px 44px 52px;background:var(--bg);}
+.store-head{display:flex;align-items:baseline;gap:12px;margin-bottom:28px;}
+.store-ttl{font-size:26px;font-weight:700;letter-spacing:-0.5px;color:var(--text-h);margin:0;}
+.store-cnt{font-size:13px;color:var(--text);}
+.store-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:200px;grid-auto-flow:dense;gap:14px;}
+.tile{display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow 0.22s,transform 0.22s,border-color 0.22s;}
+.tile:hover{box-shadow:var(--shadow);transform:translateY(-2px);border-color:var(--border);}
+.tile--big{grid-column:span 2;grid-row:span 3;}
+.tile--med{grid-column:span 1;grid-row:span 2;}
+.tile--sm{grid-column:span 1;grid-row:span 1;}
+.tile-img-w{position:relative;flex:1;background:var(--bg2);overflow:hidden;min-height:0;transition:background 0.3s;}
+.tile-img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.05);transition:transform 0.38s ease;}
+.tile:hover .tile-img{transform:scale(1.09);}
+.tile-tag{position:absolute;bottom:10px;left:10px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:3px;pointer-events:none;}
+.tile-heart{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:none;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:color 0.18s,transform 0.18s;color:var(--text);}
+.tile-heart:hover{transform:scale(1.15);color:var(--accent);}
+.tile-heart.on{color:var(--accent);}
+.tile-info{padding:12px 14px 14px;display:flex;flex-direction:column;gap:3px;}
+.tile-brand{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0;}
+.tile-name{font-size:14px;font-weight:600;color:var(--text-h);margin:0;line-height:1.3;}
+.tile--sm .tile-name{font-size:12px;}
+.tile-colorway{font-size:11px;color:var(--text);margin:0;}
+.tile-bot{display:flex;align-items:center;justify-content:space-between;margin-top:5px;}
+.tile-price{font-size:15px;font-weight:700;color:var(--text-h);margin:0;}
+.tile--sm .tile-price{font-size:13px;}
+.tile-add{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);padding:6px 12px;cursor:pointer;transition:opacity 0.15s,transform 0.15s;}
+.tile-add:hover{opacity:0.85;transform:translateY(-1px);}
+.tile-cart-ico{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--text-h);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+.tile-cart-ico:hover{background:var(--accent);border-color:var(--accent);color:var(--bg);}
+
+/* ── Item Detail ── */
+.item-pg{padding:24px 44px 44px;background:var(--bg);}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text);background:none;border:none;cursor:pointer;padding:0;margin-bottom:24px;transition:color 0.15s;}
+.back-btn:hover{color:var(--text-h);}
+.item-layout{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+.gallery{display:flex;flex-direction:column;gap:10px;}
+.gal-main{aspect-ratio:4/3;background:var(--bg2);border-radius:6px;overflow:hidden;transition:background 0.3s;}
+.gal-img{width:100%;height:100%;object-fit:contain;transform:scale(1.05);transition:transform 0.42s ease;}
+.gal-main:hover .gal-img{transform:scale(1.09);}
+.gal-thumbs{display:flex;gap:7px;}
+.gal-thumb{flex:1;aspect-ratio:1;background:var(--bg2);border:2px solid transparent;border-radius:4px;overflow:hidden;cursor:pointer;padding:0;transition:border-color 0.15s;}
+.gal-thumb.on{border-color:var(--accent);}
+.gal-thumb img{width:100%;height:100%;object-fit:contain;}
+.item-det{display:flex;flex-direction:column;gap:11px;}
+.i-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:4px;padding:3px 8px;align-self:flex-start;}
+.i-brand{font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--text);margin:0;}
+.i-name{font-size:28px;font-weight:700;letter-spacing:-0.5px;color:var(--text-h);margin:0;line-height:1.1;}
+.i-colorway{font-size:13px;color:var(--text);margin:0;}
+.i-price{font-size:22px;font-weight:600;color:var(--text-h);margin:0;}
+.i-desc{font-size:13px;line-height:1.7;color:var(--text);margin:0;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.i-sizes{display:flex;flex-direction:column;gap:9px;}
+.i-sizes-lbl{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text);margin:0;}
+.i-size-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.i-size-btn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 6px;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:border-color 0.15s,background 0.15s,transform 0.15s;}
+.i-size-btn:hover{border-color:var(--accent-border);background:var(--accent-bg);transform:translateY(-1px);}
+.i-size-btn.on{border-color:var(--accent);background:var(--accent-bg);}
+.i-size-btn.on .i-eu{color:var(--accent);}
+.i-eu{font-size:12px;font-weight:600;color:var(--text-h);}
+.i-us{font-size:9px;color:var(--text);}
+.i-actions{display:flex;gap:8px;align-items:center;padding-top:2px;}
+.i-atc{flex:1;font-size:12px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;padding:13px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer;border-radius:0;transition:opacity 0.15s,transform 0.15s;}
+.i-atc:hover{opacity:0.88;transform:translateY(-1px);}
+.i-wish{display:flex;align-items:center;justify-content:center;width:46px;height:46px;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text);transition:border-color 0.15s,color 0.15s;}
+.i-wish:hover,.i-wish.on{border-color:var(--accent-border);color:var(--accent);}
+
+/* ── Admin shared ── */
+.admin-layout{display:flex;height:680px;background:var(--bg);}
+.admin-sidebar{width:210px;flex-shrink:0;background:#0e0c13;display:flex;flex-direction:column;}
+.adm-sb-hdr{padding:20px 16px 13px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.adm-sb-ttl{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin:0;}
+.adm-sb-nav{display:flex;flex-direction:column;padding:10px 8px;flex:1;gap:2px;}
+.adm-nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:6px;font-size:13px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;transition:background 0.15s,color 0.15s;}
+.adm-nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+.adm-nav-item.active{background:rgba(255,255,255,0.1);color:#fff;}
+.adm-sb-footer{padding:12px 8px;border-top:1px solid rgba(255,255,255,0.08);}
+.adm-back{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.35);padding:7px 10px;border-radius:6px;background:transparent;border:none;cursor:pointer;width:100%;transition:color 0.15s,background 0.15s;}
+.adm-back:hover{color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.06);}
+.adm-main{flex:1;overflow-y:auto;background:var(--bg);transition:background 0.3s;}
+.adm-page{padding:32px 36px 52px;display:flex;flex-direction:column;gap:20px;max-width:960px;}
+.adm-ph{display:flex;align-items:baseline;justify-content:space-between;gap:16px;}
+.adm-title{font-size:20px;font-weight:700;color:var(--text-h);margin:0;}
+.adm-date{font-size:12px;color:var(--text);margin:0;}
+
+/* Stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stat-card{border:1px solid var(--border);padding:17px 20px;display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:border-color 0.15s,background 0.15s,transform 0.18s;}
+.stat-card:hover{border-color:var(--accent-border);background:var(--accent-bg);transform:translateY(-2px);}
+.stat-card.acc{border-color:var(--accent-border);background:var(--accent-bg);}
+.stat-val{font-size:26px;font-weight:700;color:var(--text-h);margin:0;line-height:1;}
+.stat-lbl{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin:3px 0 0;}
+.stat-sub{font-size:10px;color:var(--text);margin:0;opacity:0.7;}
+
+/* Cards */
+.adm-card{border:1px solid var(--border);padding:16px 20px;display:flex;flex-direction:column;gap:12px;transition:border-color 0.3s;}
+.adm-card-top{display:flex;align-items:center;justify-content:space-between;}
+.adm-card-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-h);margin:0;}
+.adm-act-btn{font-size:11px;font-weight:600;background:transparent;border:1px solid var(--border);padding:4px 10px;cursor:pointer;color:var(--text-h);transition:background 0.15s,border-color 0.15s,transform 0.15s;}
+.adm-act-btn:hover{background:var(--accent-bg);border-color:var(--accent-border);transform:translateY(-1px);}
+.dash-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;align-items:start;}
+.dash-side{display:flex;flex-direction:column;gap:14px;}
+
+/* Table */
+.adm-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.adm-tbl th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);padding:7px 9px;border-bottom:1px solid var(--border);}
+.adm-tbl td{padding:8px 9px;border-bottom:1px solid var(--border);color:var(--text-h);vertical-align:middle;}
+.adm-tbl tr:last-child td{border-bottom:none;}
+.adm-tbl tr:hover td{background:var(--accent-bg);cursor:pointer;}
+.td-mono{font-family:ui-monospace,monospace;font-size:11px;color:var(--text);}
+.td-muted{color:var(--text);font-size:11px;}
+
+/* Badges */
+.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;display:inline-block;white-space:nowrap;}
+.bg-green{background:rgba(52,199,89,0.12);color:#1a7a35;}
+.bg-blue{background:rgba(10,132,255,0.12);color:#0a5ac2;}
+.bg-yellow{background:rgba(255,159,10,0.12);color:#a06300;}
+.bg-red{background:rgba(255,59,48,0.12);color:#c0392b;}
+
+/* List rows */
+.list-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;}
+.list-item:last-child{border-bottom:none;}
+.list-item:hover{background:var(--accent-bg);}
+.li-name{font-size:12px;font-weight:500;color:var(--text-h);margin:0;}
+.li-sub{font-size:11px;color:var(--text);margin:1px 0 0;}
+.li-r{font-size:12px;font-weight:600;color:var(--text-h);flex-shrink:0;}
+.empty{font-size:12px;color:var(--text);opacity:0.7;}
+
+/* Calendar */
+.cal-layout{display:grid;grid-template-columns:1fr 260px;gap:14px;align-items:start;}
+.cal-box{border:1px solid var(--border);padding:16px;}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-month{font-size:14px;font-weight:700;color:var(--text-h);margin:0;}
+.cal-btn{background:transparent;border:1px solid var(--border);cursor:pointer;color:var(--text-h);display:flex;align-items:center;justify-content:center;width:28px;height:28px;transition:background 0.15s;}
+.cal-btn:hover{background:var(--accent-bg);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dl{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text);text-align:center;padding:3px 0 6px;}
+.cal-day{display:flex;flex-direction:column;align-items:center;padding:4px 2px;background:transparent;border:1px solid transparent;cursor:pointer;border-radius:4px;gap:2px;min-height:38px;transition:background 0.12s,border-color 0.12s;}
+.cal-day:hover{background:var(--accent-bg);border-color:var(--accent-border);}
+.cal-day.today .dn{background:var(--text-h);color:var(--bg);border-radius:50%;}
+.cal-day.sel{background:var(--accent-bg);border-color:var(--accent-border);}
+.dn{font-size:11px;font-weight:500;color:var(--text-h);width:20px;height:20px;display:flex;align-items:center;justify-content:center;}
+.dots-row{display:flex;gap:2px;}
+.cal-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);}
+
+/* Stock table */
+.stock-ctrl{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-h);}
+.stock-btn{width:20px;height:20px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--text-h);display:flex;align-items:center;justify-content:center;transition:background 0.15s;}
+.stock-btn:hover{background:var(--accent-bg);}
+.stock-low{color:#c0392b;font-weight:700;}
+.adm-btn{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;cursor:pointer;border-radius:0;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);transition:opacity 0.15s;}
+.adm-btn:hover{opacity:0.85;}
+</style>
+</head>
+<body>
+<script type="text/babel">
+const { useState, useRef, useEffect, useMemo } = React;
+
+const PRODUCTS = [
+  { id:1, brand:'Travis Scott x Air Jordan', name:'Jordan Jumpman Jack TR', colorway:"Green Spark", price:189.99, tag:'New Arrival', img:'assets/home_display_item_1.png', accent:'#5faa6e', size:'big', desc:'A Travis Scott collaboration reimagining the Jumpman Jack silhouette with earthy tones and signature reversed Swoosh detailing.' },
+  { id:2, brand:'Adidas', name:'BADBO 1.0', colorway:"Rise", price:174.99, tag:'Best Seller', img:'assets/home_display_item_2.png', accent:'#e0743a', size:'med', desc:"The iconic silhouette returns in its most recognizable colorway — bold orange accents meet premium knit construction." },
+  { id:3, brand:'Nike Kobe Dunk Low', name:"Proto Lower Merion", colorway:"Aces Home", price:229.99, tag:'Limited Edition', img:'assets/home_display_item_3.png', accent:'#b85c8a', size:'med', desc:'High-frequency Primeknit construction with full-length Boost cushioning in the unmistakable Zebra print.' },
+  { id:4, brand:'Kobe Bryant x Nike', name:"Force 1 Low", colorway:"Merion", price:199.99, tag:'Heritage', img:'assets/home_display_item_4.png', accent:'#7b6ec9', size:'sm', desc:'Made in USA craftsmanship with premium pigskin leather and mesh upper, featuring ENCAP midsole technology.' },
+  { id:5, brand:'Nike Air', name:'Foamposite Pro', colorway:"University Blue", price:299.99, tag:'Sale', img:'assets/home_display_item_5.png', accent:'#4e8fd4', size:'sm', desc:"Deconstructed take on the AF1 classic, featuring exposed foam, zip ties, and signature quotation mark branding." },
+];
+
+const SIZES = [{eu:'39',us:'6.5'},{eu:'40',us:'7'},{eu:'41',us:'7.5'},{eu:'42',us:'8'},{eu:'43',us:'9'},{eu:'44',us:'9.5'},{eu:'45',us:'10'},{eu:'46',us:'11'}];
+
+const ORDERS = [
+  {id:'ORD-0042',customer:'Alex Rivera',product:'Jordan Jumpman Jack TR',total:189.99,status:'delivered',date:'2026-04-20',sizeEu:'42'},
+  {id:'ORD-0041',customer:'Jordan Kim',product:'Adidas BADBO 1.0',total:174.99,status:'shipped',date:'2026-04-22',sizeEu:'41'},
+  {id:'ORD-0040',customer:'Sam Osei',product:'Nike Foamposite Pro',total:299.99,status:'processing',date:'2026-04-23',sizeEu:'44'},
+  {id:'ORD-0039',customer:'Mia Patel',product:'Force 1 Low Merion',total:199.99,status:'delivered',date:'2026-04-19',sizeEu:'38'},
+  {id:'ORD-0038',customer:'Chris Yoon',product:'Nike Kobe Dunk Low',total:229.99,status:'shipped',date:'2026-04-23',sizeEu:'43'},
+  {id:'ORD-0037',customer:'Dana Levi',product:'Jordan Jumpman Jack TR',total:189.99,status:'processing',date:'2026-04-18',sizeEu:'40'},
+  {id:'ORD-0036',customer:'Taylor Brooks',product:'Adidas BADBO 1.0',total:174.99,status:'delivered',date:'2026-04-17',sizeEu:'42'},
+];
+
+const INVENTORY = [
+  {id:1,name:'Jordan Jumpman Jack TR',colorway:'Green Spark',price:189.99,stock:14,tag:'New Arrival'},
+  {id:2,name:'Adidas BADBO 1.0',colorway:'Rise',price:174.99,stock:2,tag:'Best Seller'},
+  {id:3,name:'Nike Kobe Dunk Low',colorway:'Aces Home',price:229.99,stock:7,tag:'Limited'},
+  {id:4,name:'Force 1 Low Merion',colorway:'Merion',price:199.99,stock:1,tag:'Heritage'},
+  {id:5,name:'Nike Foamposite Pro',colorway:'University Blue',price:299.99,stock:5,tag:'Sale'},
+];
+
+const TODAY = '2026-04-23';
+const SC = {delivered:'bg-green',shipped:'bg-blue',processing:'bg-yellow'};
+
+/* ── Icons ── */
+function ICart({size=20}){return<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>}
+function IMenu({size=20}){return<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>}
+function IHeart({filled,size=16}){return filled?<svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>:<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
+function IChevL({size=14}){return<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>}
+function IChevR({size=14}){return<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>}
+function IDash(){return<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>}
+function IOrders(){return<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>}
+function IStock(){return<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>}
+
+/* ── Nav component ── */
+function Nav({screen, setScreen, dark}) {
+  const pages = ['home','store'];
+  const labels = {home:'Home',store:'Store'};
+  return (
+    <div className="ss-nav">
+      <div className="ss-nav-left"><span className="ss-logo">SoleStore</span></div>
+      <div className="ss-nav-center">
+        {pages.map(p => <button key={p} className={`ss-navlink${screen===p?' active':''}`} onClick={() => setScreen(p)}>{labels[p]}</button>)}
+      </div>
+      <div className="ss-nav-right">
+        <button className="ss-icon-btn"><ICart /></button>
+        <button className="ss-icon-btn"><IMenu /></button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Home screen ── */
+function HomeScreen({setScreen, dark}) {
+  const [idx, setIdx] = useState(0);
+  const [selSize, setSelSize] = useState(null);
+  const p = PRODUCTS[idx];
+  const acc = p.accent;
+
+  useEffect(() => { setSelSize(null); }, [idx]);
+
+  return (
+    <div className={`ss${dark?' dark':''}`}>
+      <Nav screen="home" setScreen={setScreen} dark={dark} />
+      <div className="home" style={{'--accent':acc,'--accent-bg':`${acc}18`,'--accent-border':`${acc}44`}}>
+        <div className="home-info">
+          <span className="h-tag" style={{background:`${acc}18`,color:acc,border:`1px solid ${acc}44`}}>{p.tag}</span>
+          <p className="h-brand">{p.brand}</p>
+          <p className="h-name">{p.name}</p>
+          <p className="h-colorway">{p.colorway}</p>
+          <p className="h-price">${p.price.toFixed(2)}</p>
+          <p className="h-desc">{p.desc}</p>
+        </div>
+        <img key={idx} className="home-img" src={p.img} alt={p.name} />
+        <div className="home-sizes">
+          <p className="sizes-label">Size</p>
+          <div className="sizes-row">
+            {SIZES.slice(0,5).map(s => (
+              <button key={s.eu} className={`size-chip${selSize?.eu===s.eu?' sel':''}`} onClick={() => setSelSize(s)}>
+                <span className="s-eu">EU {s.eu}</span><span className="s-us">US {s.us}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="home-btns">
+          <button className="h-btn h-btn--outline" onClick={() => setScreen('store')}>Browse Store</button>
+          <button className="h-btn h-btn--solid" style={{background:acc,borderColor:acc}}>
+            {selSize ? 'Add to Cart' : 'Select Size'}
+          </button>
+        </div>
+        <div className="home-captions">
+          <button className="nav-circ" onClick={() => setIdx(i => (i-1+PRODUCTS.length)%PRODUCTS.length)}><IChevL /></button>
+          <div style={{display:'flex',gap:5}}>
+            {PRODUCTS.map((_,i) => <button key={i} className={`dot${i===idx?' on':''}`} style={{background: i===idx ? '#08060d' : '#e5e4e7'}} onClick={() => setIdx(i)} />)}
+          </div>
+          <button className="nav-circ" onClick={() => setIdx(i => (i+1)%PRODUCTS.length)}><IChevR /></button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Store screen ── */
+function StoreScreen({setScreen, setItemId, dark}) {
+  const [wished, setWished] = useState(new Set());
+  const toggle = id => setWished(w => { const n=new Set(w); n.has(id)?n.delete(id):n.add(id); return n; });
+  const sizes = ['big','med','med','sm','sm'];
+  return (
+    <div className={`ss${dark?' dark':''}`}>
+      <Nav screen="store" setScreen={setScreen} dark={dark} />
+      <div className="store-page">
+        <div className="store-head">
+          <h1 className="store-ttl">Store</h1>
+          <span className="store-cnt">{PRODUCTS.length} products</span>
+        </div>
+        <div className="store-grid">
+          {PRODUCTS.map((p, i) => (
+            <div key={p.id} className={`tile tile--${sizes[i]}`} onClick={() => { setItemId(p.id); setScreen('item'); }}>
+              <div className="tile-img-w">
+                <img className="tile-img" src={p.img} alt={p.name} />
+                <span className="tile-tag" style={{background:`${p.accent}18`,color:p.accent}}>{p.tag}</span>
+                <button className={`tile-heart${wished.has(p.id)?' on':''}`} onClick={e => { e.stopPropagation(); toggle(p.id); }}>
+                  <IHeart filled={wished.has(p.id)} size={14} />
+                </button>
+              </div>
+              <div className="tile-info">
+                <p className="tile-brand" style={{color:p.accent}}>{p.brand}</p>
+                <p className="tile-name">{p.name}</p>
+                <p className="tile-colorway">{p.colorway}</p>
+                <div className="tile-bot">
+                  <p className="tile-price">${p.price.toFixed(2)}</p>
+                  {sizes[i] !== 'sm'
+                    ? <button className="tile-add" onClick={e => e.stopPropagation()}>Add to Cart</button>
+                    : <button className="tile-cart-ico" onClick={e => e.stopPropagation()}><ICart size={13} /></button>
+                  }
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Item detail screen ── */
+function ItemScreen({itemId, setScreen, dark}) {
+  const p = PRODUCTS.find(x => x.id === itemId) || PRODUCTS[0];
+  const [thumb, setThumb] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [wished, setWished] = useState(false);
+  const imgs = [p.img, PRODUCTS[(PRODUCTS.indexOf(p)+1)%PRODUCTS.length].img];
+  return (
+    <div className={`ss${dark?' dark':''}`}>
+      <Nav screen="store" setScreen={setScreen} dark={dark} />
+      <div className="item-pg">
+        <button className="back-btn" onClick={() => setScreen('store')}><IChevL /> Back to Store</button>
+        <div className="item-layout">
+          <div className="gallery">
+            <div className="gal-main">
+              <img key={thumb} className="gal-img" src={imgs[thumb]} alt={p.name} />
+            </div>
+            <div className="gal-thumbs">
+              {imgs.map((src,i) => (
+                <button key={i} className={`gal-thumb${thumb===i?' on':''}`} onClick={() => setThumb(i)}>
+                  <img src={src} alt="" />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="item-det">
+            <span className="i-tag" style={{color:p.accent,background:`${p.accent}18`,borderColor:`${p.accent}44`}}>{p.tag}</span>
+            <p className="i-brand">{p.brand}</p>
+            <p className="i-name">{p.name}</p>
+            <p className="i-colorway">{p.colorway}</p>
+            <p className="i-price">${p.price.toFixed(2)}</p>
+            <p className="i-desc">{p.desc}</p>
+            <div className="i-sizes">
+              <p className="i-sizes-lbl">Size</p>
+              <div className="i-size-grid">
+                {SIZES.map(s => (
+                  <button key={s.eu} className={`i-size-btn${sel?.eu===s.eu?' on':''}`} onClick={() => setSel(s)}>
+                    <span className="i-eu">EU {s.eu}</span><span className="i-us">US {s.us}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="i-actions">
+              <button className="i-atc">{sel ? 'Add to Cart' : 'Select a Size'}</button>
+              <button className={`i-wish${wished?' on':''}`} onClick={() => setWished(w => !w)}>
+                <IHeart filled={wished} size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Admin shared sidebar ── */
+function AdminSidebar({page, setPage}) {
+  const items = [
+    {id:'dashboard',label:'Dashboard',icon:<IDash />},
+    {id:'orders',label:'Orders',icon:<IOrders />},
+    {id:'stock',label:'Stock',icon:<IStock />},
+  ];
+  return (
+    <aside className="admin-sidebar">
+      <div className="adm-sb-hdr"><p className="adm-sb-ttl">Admin</p></div>
+      <nav className="adm-sb-nav">
+        {items.map(i => (
+          <button key={i.id} className={`adm-nav-item${page===i.id?' active':''}`} onClick={() => setPage(i.id)}>
+            {i.icon}{i.label}
+          </button>
+        ))}
+      </nav>
+      <div className="adm-sb-footer">
+        <button className="adm-back"><IChevL size={12} /> Back to Store</button>
+      </div>
+    </aside>
+  );
+}
+
+/* ── Admin Dashboard ── */
+function AdminDashboard({setAdminPage}) {
+  const today = ORDERS.filter(o => o.date === TODAY);
+  const low = INVENTORY.filter(i => i.stock <= 3);
+  const total = INVENTORY.reduce((s,i) => s+i.stock, 0);
+  return (
+    <div className="adm-page">
+      <div className="adm-ph">
+        <h1 className="adm-title">Dashboard</h1>
+        <p className="adm-date">Wednesday, 23 April 2026</p>
+      </div>
+      <div className="stat-row">
+        <div className="stat-card" onClick={() => setAdminPage('stock')}>
+          <p className="stat-val">{total}</p><p className="stat-lbl">Total Stock</p><p className="stat-sub">units across all products</p>
+        </div>
+        <div className="stat-card" onClick={() => setAdminPage('orders')}>
+          <p className="stat-val">{ORDERS.length}</p><p className="stat-lbl">Total Orders</p><p className="stat-sub">all time</p>
+        </div>
+        <div className="stat-card acc">
+          <p className="stat-val">{today.length}</p><p className="stat-lbl">Today's Orders</p><p className="stat-sub">going out today</p>
+        </div>
+        <div className="stat-card">
+          <p className="stat-val">View →</p><p className="stat-lbl">Audit & Tax</p><p className="stat-sub">revenue · tax · ledger</p>
+        </div>
+      </div>
+      <div className="dash-grid">
+        <div className="adm-card">
+          <div className="adm-card-top">
+            <p className="adm-card-ttl">Recent Orders</p>
+            <button className="adm-act-btn" onClick={() => setAdminPage('orders')}>View All</button>
+          </div>
+          <table className="adm-tbl">
+            <thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>
+              {[...ORDERS].reverse().slice(0,5).map(o => (
+                <tr key={o.id}>
+                  <td className="td-mono">{o.id}</td>
+                  <td>{o.customer}</td>
+                  <td className="td-muted">{o.product}</td>
+                  <td>${o.total.toFixed(2)}</td>
+                  <td><span className={`badge ${SC[o.status]}`}>{o.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="dash-side">
+          <div className="adm-card">
+            <div className="adm-card-top"><p className="adm-card-ttl">Going Out Today</p></div>
+            {today.length === 0 ? <p className="empty">No orders today.</p> : today.map(o => (
+              <div key={o.id} className="list-item">
+                <div><p className="li-name">{o.customer}</p><p className="li-sub">{o.product}</p></div>
+                <span className="li-r">${o.total.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+          <div className="adm-card">
+            <div className="adm-card-top"><p className="adm-card-ttl">Low Stock</p><button className="adm-act-btn" onClick={() => setAdminPage('stock')}>Manage</button></div>
+            {low.length === 0 ? <p className="empty">All items stocked.</p> : low.map(i => (
+              <div key={i.id} className="list-item">
+                <div><p className="li-name">{i.name}</p><p className="li-sub">{i.colorway}</p></div>
+                <span className="badge bg-red">{i.stock} left</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Admin Orders ── */
+function AdminOrders() {
+  const [calOff, setCalOff] = useState(0);
+  const [selDay, setSelDay] = useState(null);
+  const now = new Date(2026, 3, 1); // April 2026
+  const calDate = new Date(now.getFullYear(), now.getMonth() + calOff, 1);
+  const monthName = calDate.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const firstDow = calDate.getDay();
+  const daysInMonth = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0).getDate();
+  const byDate = useMemo(() => { const m={}; ORDERS.forEach(o => { m[o.date]=(m[o.date]||0)+1; }); return m; }, []);
+  const dayStr = d => { const mo=String(calDate.getMonth()+1).padStart(2,'0'),dd=String(d).padStart(2,'0'); return `${calDate.getFullYear()}-${mo}-${dd}`; };
+  const shown = selDay ? ORDERS.filter(o => o.date === selDay) : ORDERS;
+  return (
+    <div className="adm-page">
+      <div className="adm-ph">
+        <h1 className="adm-title">Orders</h1>
+        {selDay && <button className="adm-act-btn" onClick={() => setSelDay(null)}>Clear filter</button>}
+      </div>
+      <div className="cal-layout">
+        <div className="cal-box">
+          <div className="cal-hdr">
+            <button className="cal-btn" onClick={() => setCalOff(o => o-1)}><IChevL /></button>
+            <p className="cal-month">{monthName}</p>
+            <button className="cal-btn" onClick={() => setCalOff(o => o+1)}><IChevR /></button>
+          </div>
+          <div className="cal-grid">
+            {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => <div key={d} className="cal-dl">{d}</div>)}
+            {Array.from({length:firstDow}).map((_,i) => <div key={`e${i}`}/>)}
+            {Array.from({length:daysInMonth}).map((_,i) => {
+              const d=i+1, ds=dayStr(d), dots=byDate[ds]||0, isT=ds===TODAY, isSel=ds===selDay;
+              return (
+                <button key={d} className={`cal-day${isT?' today':''}${isSel?' sel':''}`} onClick={() => setSelDay(s => s===ds?null:ds)}>
+                  <span className="dn">{d}</span>
+                  {dots>0 && <div className="dots-row">{Array.from({length:Math.min(dots,3)}).map((_,j) => <span key={j} className="cal-dot"/>)}</div>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="adm-card" style={{maxHeight:340,overflowY:'auto'}}>
+          <p className="adm-card-ttl">{selDay || 'All Orders'}</p>
+          {shown.length===0 ? <p className="empty">No orders.</p> : shown.map(o => (
+            <div key={o.id} className="list-item">
+              <div>
+                <p className="li-name">{o.customer}</p>
+                <p className="li-sub" style={{fontFamily:'ui-monospace,monospace',fontSize:10}}>{o.id}</p>
+                <p className="li-sub">{o.product}</p>
+              </div>
+              <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:3}}>
+                <span className="li-r">${o.total.toFixed(2)}</span>
+                <span className={`badge ${SC[o.status]}`}>{o.status}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Admin Stock ── */
+function AdminStock() {
+  const [stocks, setStocks] = useState(() => Object.fromEntries(INVENTORY.map(i => [i.id, i.stock])));
+  const adj = (id, d) => setStocks(s => ({...s, [id]: Math.max(0, s[id]+d)}));
+  return (
+    <div className="adm-page">
+      <div className="adm-ph">
+        <h1 className="adm-title">Stock</h1>
+        <button className="adm-btn">+ Add Product</button>
+      </div>
+      <div className="adm-card" style={{padding:0}}>
+        <table className="adm-tbl">
+          <thead><tr>
+            <th style={{paddingLeft:18}}>Product</th>
+            <th>Colorway</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Tag</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody>
+            {INVENTORY.map(item => {
+              const s = stocks[item.id];
+              return (
+                <tr key={item.id}>
+                  <td style={{paddingLeft:18}}>
+                    <p style={{fontWeight:500,color:'var(--text-h)',margin:0,fontSize:13}}>{item.name}</p>
+                  </td>
+                  <td className="td-muted">{item.colorway}</td>
+                  <td>${item.price.toFixed(2)}</td>
+                  <td>
+                    <div className="stock-ctrl">
+                      <button className="stock-btn" onClick={() => adj(item.id,-1)} disabled={s===0}>−</button>
+                      <span className={s<=3?'stock-low':''}>{s}</span>
+                      <button className="stock-btn" onClick={() => adj(item.id,1)}>+</button>
+                    </div>
+                  </td>
+                  <td><span className="badge bg-blue">{item.tag}</span></td>
+                  <td>
+                    <div style={{display:'flex',gap:5}}>
+                      <button className="adm-act-btn">Edit</button>
+                      <button className="adm-act-btn" style={{color:'#c0392b',borderColor:'rgba(192,57,43,0.3)'}}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/* ── Admin wrapper ── */
+function AdminScreen({initPage, dark}) {
+  const [adminPage, setAdminPage] = useState(initPage || 'dashboard');
+  return (
+    <div className={`ss${dark?' dark':''}`}>
+      <div className="admin-layout">
+        <AdminSidebar page={adminPage} setPage={setAdminPage} />
+        <div className="adm-main">
+          {adminPage === 'dashboard' && <AdminDashboard setAdminPage={setAdminPage} />}
+          {adminPage === 'orders'    && <AdminOrders />}
+          {adminPage === 'stock'     && <AdminStock />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Browser chrome ── */
+function BrowserChrome({url, title, children}) {
+  return (
+    <div className="chrome">
+      <div className="chrome-bar">
+        <div className="chrome-lights">
+          <div className="chrome-light" style={{background:'#ff5f57'}}/>
+          <div className="chrome-light" style={{background:'#febc2e'}}/>
+          <div className="chrome-light" style={{background:'#28c840'}}/>
+        </div>
+        <div className="chrome-tab">
+          <div className="chrome-favicon"/>
+          <span className="chrome-tab-label">{title}</span>
+        </div>
+        <div style={{flex:1,margin:'0 10px'}}>
+          <div className="chrome-url-bar">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span className="chrome-url-text">{url}</span>
+          </div>
+        </div>
+      </div>
+      <div className="chrome-content">{children}</div>
+    </div>
+  );
+}
+
+/* ── App ── */
+const SCREENS = [
+  {id:'home',    label:'Home',      group:'storefront', url:'solestore.com/',       title:'SoleStore — Home'},
+  {id:'store',   label:'Store',     group:'storefront', url:'solestore.com/store',  title:'SoleStore — Store'},
+  {id:'item',    label:'Item Detail',group:'storefront',url:'solestore.com/item/1', title:'Jordan Jumpman Jack TR — SoleStore'},
+  {id:'dashboard',label:'Dashboard',group:'admin',     url:'solestore.com/admin',  title:'Admin — Dashboard'},
+  {id:'orders',   label:'Orders',   group:'admin',      url:'solestore.com/admin/orders', title:'Admin — Orders'},
+  {id:'stock',    label:'Stock',    group:'admin',      url:'solestore.com/admin/stock',  title:'Admin — Stock'},
+];
+
+function App() {
+  const stored = (() => { try { return JSON.parse(localStorage.getItem('ss_mockup')||'{}'); } catch { return {}; } })();
+  const [screen, setScreen] = useState(stored.screen || 'home');
+  const [dark, setDark] = useState(stored.dark || false);
+  const [itemId, setItemId] = useState(1);
+
+  function go(s) { setScreen(s); try { localStorage.setItem('ss_mockup', JSON.stringify({screen:s, dark})); } catch {} }
+  function toggleDark() { setDark(d => { try { localStorage.setItem('ss_mockup', JSON.stringify({screen, dark:!d})); } catch {} return !d; }); }
+
+  const cur = SCREENS.find(s => s.id === screen) || SCREENS[0];
+
+  // Apply dark class to .ss elements
+  const ssClass = `ss${dark?' dark':''}`;
+
+  return (
+    <div className="pres">
+      <div className="topbar">
+        <span className="topbar-brand">SoleStore</span>
+        <div className="screen-tabs">
+          {SCREENS.map(s => (
+            <button key={s.id} className={`screen-tab${screen===s.id?' active':''}`} onClick={() => go(s.id)}>
+              {s.group === 'admin' ? '⚙ ' : ''}{s.label}
+            </button>
+          ))}
+        </div>
+        <div className="topbar-right">
+          <button className="dm-btn" onClick={toggleDark}>{dark ? '☀ Light' : '◑ Dark'}</button>
+        </div>
+      </div>
+
+      <div className="browser-wrap">
+        <BrowserChrome url={cur.url} title={cur.title}>
+            {screen === 'home'      && <HomeScreen setScreen={go} dark={dark} />}
+            {screen === 'store'     && <StoreScreen setScreen={go} setItemId={setItemId} dark={dark} />}
+            {screen === 'item'      && <ItemScreen itemId={itemId} setScreen={go} dark={dark} />}
+            {(screen === 'dashboard' || screen === 'orders' || screen === 'stock') &&
+              <AdminScreen key={screen} initPage={screen} dark={dark} />}
+        </BrowserChrome>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+<div id="root"></div>
+</body>
+</html>
